@@ -18,6 +18,7 @@ export function formatDate2() {
    }
 export function formatDate3(time) {  
     let date = new Date(time);
+    return date
    }
 export function changetime1(time){
     let timelst=time.split(':')
@@ -29,6 +30,15 @@ export function changetime2(time){
     let h= Math.floor(time / 3600); 
     let m= Math.floor((time-3600*h) /60);
     let s=time-3600*h-60*m;
+    if(h<10){
+        h='0'+h;
+    };
+    if(m<10){
+        m='0'+m;
+    };
+    if(s<10){
+        s='0'+s;
+    };
    return h+':'+m+':'+s 
     }
     else{

@@ -12,7 +12,7 @@ function  errcatch(error){
         Message.error('用户名错误或不存在');
     }
     else if (statuscode==401){
-        router.push('/index');
+        // router.push('/index');
         alert('身份过期，请重新登录');
     }
     else if (statuscode==403){
