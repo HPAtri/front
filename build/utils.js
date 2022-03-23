@@ -49,6 +49,7 @@ exports.cssLoaders = function (options) {
         //publicPath:'../../',
         use: loaders,
         fallback: 'vue-style-loader',
+        publicPath:'../../'
       })
     } else {
       return ['vue-style-loader'].concat(loaders)
