@@ -38,6 +38,7 @@
     </el-form>
     <el-table
       :data="pagekecheng"
+      height="400"
       border
       style="width: 90%;margin-left:20px"
       size="mini"
@@ -54,7 +55,7 @@
       </el-table-column>
       <el-table-column prop="ID" label="课程ID" width="120" align="center">
       </el-table-column>
-      <el-table-column prop="name" label="课程编号" width="140" align="center">
+      <el-table-column prop="Name" label="课程名" width="240" align="center">
       </el-table-column>
       <el-table-column
         prop="TimeBegin"
@@ -71,8 +72,8 @@
       >
       </el-table-column>
       <el-table-column
-        prop="ID_Location__name"
-        label="地点id"
+        prop="ID_Location"
+        label="地点ID"
         width="140"
         align="center"
       >
@@ -472,7 +473,7 @@
 <script>
 import axios from "axios";
 import { errcatch } from "../../errcatch";
-import { changetime1, changetime2 } from "../../timeset";
+import { changetime1, changetime2} from "../../timeset";
 export default {
   data() {
     // 校验设备id是否存在
@@ -686,7 +687,7 @@ export default {
             ID_Speaker_NoUser: ""
           }
         ],
-        n: 0
+        n: 1
       },
       updatekechengform: {
         data: [
@@ -718,7 +719,7 @@ export default {
             ID_Speaker_NoUser: ""
           }
         ],
-        n: 0
+        n: 1
       }
     };
   },
@@ -810,12 +811,8 @@ export default {
     },
     //详情生成该课程签到记录表
     handleclick(row) {
-      //跳转路由
-      //         setTimeout(function (){
-      // 	      this.$nextTick(function (){
-      // 	      this.$bus.$emit('kaoqing',[row.ID]);
-      // })},500);
-      this.$router.push({ path: "/qiandao?index=" + row.ID });
+      localStorage.setItem("kecheng_ID",row.ID)
+      this.$router.push({ path: "/courseplan"});
     },
     //获取所有设备信息
     getkecheng: function() {
@@ -1075,7 +1072,7 @@ export default {
           if (this.isEdit) {
             this.timeup();
             this.datatrans2();
-            this.submitupdatakecheng();
+            this.submitupdatekecheng();
           } else {
             //添加
             this.timeup();
@@ -1126,7 +1123,7 @@ export default {
       this.addkechengform.data[0].MapUser2Equ = this.kechengform.MapUser2Equ;
       this.addkechengform.data[0].AboutSpeaker = this.kechengform.AboutSpeaker;
       this.addkechengform.data[0].ID_Speaker_NoUser =
-        this.kechengform.ID_Speaker_NoUser * 1;
+        this.kechengform.ID_Speaker_NoUser;
       let that = this;
       //执行Axios请求
       axios({url:"/api/" + "model_curricula/",
@@ -1167,7 +1164,7 @@ export default {
         });
     },
     //修改更新到数据库
-    submitupdatakecheng() {
+    submitupdatekecheng() {
       this.updatekechengform.data[0].ID = this.kechengform.ID * 1;
       this.updatekechengform.data[0].Rem = this.kechengform.Rem;
       this.updatekechengform.data[0].Introduction = this.kechengform.Introduction;
@@ -1181,7 +1178,7 @@ export default {
       this.updatekechengform.data[0].TimeEnd = changetime1(
         this.kechengform.TimeEnd
       );
-      this.updatekechengform.data[0].Name = this.updatekechengform.Name;
+      this.updatekechengform.data[0].Name = this.kechengform.Name;
       this.updatekechengform.data[0].Attr = this.kechengform.Attr * 1;
       this.updatekechengform.data[0].Charge = this.kechengform.Charge * 1;
       this.updatekechengform.data[0].PwAccess = this.kechengform.PwAccess * 1;
@@ -1205,7 +1202,7 @@ export default {
       this.updatekechengform.data[0].MapUser2Equ = this.kechengform.MapUser2Equ;
       this.updatekechengform.data[0].AboutSpeaker = this.kechengform.AboutSpeaker;
       this.updatekechengform.data[0].ID_Speaker_NoUser =
-        this.kechengform.ID_Speaker_NoUser * 1;
+        this.kechengform.ID_Speaker_NoUser;
       let that = this;
       //执行Axios请求
       axios

@@ -26,12 +26,6 @@
               @click="getkecheng()"
               >全部</el-button
             >
-            <el-button
-              type="primary"
-              icon="el-icon-circle-plus-outline"
-              @click="addkecheng()"
-              >添加</el-button
-            >
           </el-button-group>
         </el-col>
       </el-row>
@@ -88,20 +82,6 @@
             @click="viewkecheng(scope.row)"
           ></el-button>
           <el-button
-            type="primary"
-            icon="el-icon-edit"
-            size="mini"
-            circle
-            @click="updatekecheng(scope.row)"
-          ></el-button>
-          <el-button
-            type="danger"
-            icon="el-icon-delete"
-            size="mini"
-            circle
-            @click="deletekecheng(scope.row)"
-          ></el-button>
-          <el-button
             type="info"
             icon="el-icon-view"
             size="mini"
@@ -113,13 +93,6 @@
     </el-table>
     <el-row style="margin-top: 10px;">
       <el-col :span="8" style="text-align: left;margin-left:20px">
-        <el-button
-          type="primary"
-          icon="el-icon-delete"
-          size="mini"
-          @click="deletekechengs()"
-          >批量删除</el-button
-        >
       </el-col>
       <el-col :span="16" style="text-align: right">
         <el-pagination
@@ -142,7 +115,6 @@
     >
       <el-form
         :model="kechengform"
-        :rules="rules"
         ref="kechengform"
         :inline="true"
         style="margin-left:20px;"
@@ -544,76 +516,6 @@ export default {
         AboutSpeaker: "",
         ID_Speaker_NoUser: ""
       },
-      rules: {
-        ID: [
-          { required: true, message: "课程ID不能为空", trigger: "blur" },
-          // { validator: rulesID, trigger: "blur" }
-        ],
-        ID_Curricula: [
-          { required: true, message: "ID序列不能为空", trigger: "blur" }
-        ],
-        ID_Location: [
-          { required: true, message: "地点ID不能为空", trigger: "blur" }
-        ],
-        Name: [
-          { required: true, message: "课程名不能为空", trigger: "blur" }
-        ],
-        ID_Speaker: [
-          { required: true, message: "主讲人ID不能为空", trigger: "blur" }
-        ],
-        TimeBegin: [
-          { required: true, message: "开始时间不能为空", trigger: "blur" }
-        ],
-        TimeEnd: [
-          { required: true, message: "结束时间不能为空", trigger: "blur" }
-        ],
-        Attr: [
-          { required: true, message: "考勤类型不能为空", trigger: "blur" }
-        ],
-        Charge: [
-          { required: true, message: "是否收费不能为空", trigger: "blur" }
-        ],
-        PwAccess: [
-          { required: true, message: "派位不能为空", trigger: "blur" }
-        ],
-        PwContinuous: [
-          { required: true, message: "派位连续性不能为空", trigger: "blur" }
-        ],
-        PwDirection: [
-          { required: true, message: "派位顺序不能为空", trigger: "blur" }
-        ],
-        DoorOpen: [
-          { required: true, message: "是否开门不能为空", trigger: "blur" }
-        ],
-        TimeBeginCheckBegin: [
-          {
-            required: true,
-            message: "考勤开始最早时间不能为空",
-            trigger: "blur"
-          }
-        ],
-        TimeBeginCheckEnd: [
-          {
-            required: true,
-            message: "考勤开始最迟时间不能为空",
-            trigger: "blur"
-          }
-        ],
-        TimeEndCheckBegin: [
-          {
-            required: true,
-            message: "考勤结束最早时间不能为空",
-            trigger: "blur"
-          }
-        ],
-        TimeEndCheckEnd: [
-          {
-            required: true,
-            message: "考勤结束最迟时间不能为空",
-            trigger: "blur"
-          }
-        ]
-      },
       searchform:{
     "requires": {
           ID: 0,
@@ -658,70 +560,7 @@ export default {
       deletedialog: false,
 
       selectkechengs: [], //选择复选时把选择记录存在这里
-      addkechengform: {
-        data: [
-          {
-            Rem: "",
-            Introduction: "",
-            Name: "",
-            ID_Location: "",
-            ID_Speaker: "",
-            TimeBegin: "",
-            TimeEnd: "",
-            Attr: "",
-            Charge: "",
-            PwAccess: "",
-            PwContinuous: "",
-            PwDirection: "",
-            DoorOpen: "",
-            TimeBeginCheckBegin: "",
-            TimeBeginCheckEnd: "",
-            TimeEndCheckBegin: "",
-            TimeEndCheckEnd: "",
-            RangeUsers: "",
-            ListDepts: "",
-            RangeEqus: "",
-            ListPlaces: "",
-            MapUser2Equ: "",
-            AboutSpeaker: "",
-            ID_Speaker_NoUser: ""
-          }
-        ],
-        n: 0
-      },
-      updatekechengform: {
-        data: [
-          {
-            ID: "",
-            Rem: "",
-            Introduction: "",
-            Name: "",
-            ID_Location: "",
-            ID_Speaker: "",
-            TimeBegin: "",
-            TimeEnd: "",
-            Attr: "",
-            Charge: "",
-            PwAccess: "",
-            PwContinuous: "",
-            PwDirection: "",
-            DoorOpen: "",
-            TimeBeginCheckBegin: "",
-            TimeBeginCheckEnd: "",
-            TimeEndCheckBegin: "",
-            TimeEndCheckEnd: "",
-            RangeUsers: "",
-            ListDepts: "",
-            RangeEqus: "",
-            ListPlaces: "",
-            MapUser2Equ: "",
-            AboutSpeaker: "",
-            ID_Speaker_NoUser: ""
-          }
-        ],
-        n: 0
       }
-    };
   },
   mounted() {
     //自动加载数据
@@ -937,15 +776,6 @@ export default {
     handleSelectionChange(data) {
       this.selectkechengs = data;
     },
-    //添加课程时打开表单
-    addkecheng() {
-      //修改标题
-      this.dialogTitle = "添加课程明细";
-      this.adddialog = true;
-      //弹出表单
-      this.dialogVisible = true;
-    },
-    //关闭弹出框的表单
     closeDialogForm(formName) {
       //清空数据
       this.kechengform.ID = "";
@@ -974,55 +804,6 @@ export default {
       this.kechengform.MapUser2Equ = "";
       this.kechengform.AboutSpeaker = "";
       this.kechengform.ID_Speaker_NoUser = "";
-      this.addkechengform.data[0].Rem = "";
-      this.addkechengform.data[0].Introduction = "";
-      this.addkechengform.data[0].ID_Location = "";
-      this.addkechengform.data[0].ID_Speaker = "";
-      this.addkechengform.data[0].TimeBegin = "";
-      this.addkechengform.data[0].TimeEnd = "";
-      this.addkechengform.data[0].Name = "";
-      this.addkechengform.data[0].Attr = "";
-      this.addkechengform.data[0].Charge = "";
-      this.addkechengform.data[0].PwAccess = "";
-      this.addkechengform.data[0].PwContinuous = "";
-      this.addkechengform.data[0].PwDirection = "";
-      this.addkechengform.data[0].DoorOpen = "";
-      this.addkechengform.data[0].TimeBeginCheckBegin = "";
-      this.addkechengform.data[0].TimeBeginCheckEnd = "";
-      this.addkechengform.data[0].TimeEndCheckBegin = "";
-      this.addkechengform.data[0].TimeEndCheckEnd = "";
-      this.addkechengform.data[0].RangeUsers = "";
-      this.addkechengform.data[0].ListDepts = "";
-      this.addkechengform.data[0].RangeEqus = "";
-      this.addkechengform.data[0].ListPlaces = "";
-      this.addkechengform.data[0].MapUser2Equ = "";
-      this.addkechengform.data[0].AboutSpeaker = "";
-      this.addkechengform.data[0].ID_Speaker_NoUser = "";
-      this.updatekechengform.data[0].ID = "";
-      this.updatekechengform.data[0].Rem = "";
-      this.updatekechengform.data[0].Introduction = "";
-      this.updatekechengform.data[0].ID_Location = "";
-      this.updatekechengform.data[0].ID_Speaker = "";
-      this.updatekechengform.data[0].TimeBegin = "";
-      this.updatekechengform.data[0].TimeEnd = "";
-      this.updatekechengform.data[0].Name = "";
-      this.updatekechengform.data[0].Attr = "";
-      this.updatekechengform.data[0].Charge = "";
-      this.updatekechengform.data[0].PwAccess = "";
-      this.updatekechengform.data[0].PwContinuous = "";
-      this.updatekechengform.data[0].PwDirection = "";
-      this.updatekechengform.data[0].DoorOpen = "";
-      this.updatekechengform.data[0].TimeBeginCheckBegin = "";
-      this.updatekechengform.data[0].TimeBeginCheckEnd = "";
-      this.updatekechengform.data[0].TimeEndCheckBegin = "";
-      this.updatekechengform.data[0].TimeEndCheckEnd = "";
-      this.updatekechengform.data[0].RangeUsers = "";
-      this.updatekechengform.data[0].ListDepts = "";
-      this.updatekechengform.data[0].RangeEqus = "";
-      this.updatekechengform.data[0].ListPlaces = "";
-      this.updatekechengform.data[0].MapUser2Equ = "";
-      this.updatekechengform.data[0].AboutSpeaker = "";
-      this.updatekechengform.data[0].ID_Speaker_NoUser = "";
       this.adddialog = false;
       this.adddialog = false;
       this.viewdialog = false;
@@ -1056,307 +837,6 @@ export default {
       //进行深拷贝
       this.kechengform = JSON.parse(JSON.stringify(row));
     },
-    //修改设备的信息
-    updatekecheng(row) {
-      //修改标题
-      this.dialogTitle = "修改课程明细";
-      //修改isEdit变量
-      this.isEdit = true;
-      this.datatrans1(row);
-      this.updatedialog = true;
-      //弹出表单
-      this.dialogVisible = true;
-      this.kechengform = JSON.parse(JSON.stringify(row));
-    },
-    //提交设备的表单（添加、修改）
-    submitkechengform(formName) {
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          //校验成功后执行添加或者修改
-          if (this.isEdit) {
-            this.timeup();
-            this.datatrans2();
-            this.submitupdatekecheng();
-          } else {
-            //添加
-            this.timeup();
-            this.datatrans2();
-            this.submitaddkecheng();
-          }
-          alert("submit!");
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
-    },
-    //添加到数据库的函数
-    submitaddkecheng() {
-      this.addkechengform.data[0].Rem = this.kechengform.Rem;
-      this.addkechengform.data[0].Introduction = this.kechengform.Introduction;
-      this.addkechengform.data[0].ID_Location =
-        this.kechengform.ID_Location * 1;
-      this.addkechengform.data[0].ID_Speaker = this.kechengform.ID_Speaker * 1;
-      this.addkechengform.data[0].TimeBegin =changetime1(
-        this.kechengform.TimeBegin
-      );
-      this.addkechengform.data[0].TimeEnd =changetime1(
-        this.kechengform.TimeEnd
-      );
-      this.addkechengform.data[0].Attr = this.kechengform.Attr * 1;
-      this.addkechengform.data[0].Charge = this.kechengform.Charge * 1;
-      this.addkechengform.data[0].PwAccess = this.kechengform.PwAccess * 1;
-      this.addkechengform.data[0].PwContinuous =
-        this.kechengform.PwContinuous * 1;
-      this.addkechengform.data[0].PwDirection =
-        this.kechengform.PwDirection * 1;
-      this.addkechengform.data[0].DoorOpen = this.kechengform.DoorOpen * 1;
-      this.addkechengform.data[0].TimeBeginCheckBegin =
-        this.kechengform.TimeBeginCheckBegin * 1;
-      this.addkechengform.data[0].TimeBeginCheckEnd =
-        this.kechengform.TimeBeginCheckEnd * 1;
-      this.addkechengform.data[0].TimeEndCheckBegin =
-        this.kechengform.TimeEndCheckBegin * 1;
-      this.addkechengform.data[0].TimeEndCheckEnd =
-        this.kechengform.TimeEndCheckEnd * 1;
-      this.addkechengform.data[0].Name = this.kechengform.Name;
-      this.addkechengform.data[0].RangeUsers = this.kechengform.RangeUsers;
-      this.addkechengform.data[0].ListDepts = this.kechengform.ListDepts;
-      this.addkechengform.data[0].RangeEqus = this.kechengform.RangeEqus;
-      this.addkechengform.data[0].ListPlaces = this.kechengform.ListPlaces;
-      this.addkechengform.data[0].MapUser2Equ = this.kechengform.MapUser2Equ;
-      this.addkechengform.data[0].AboutSpeaker = this.kechengform.AboutSpeaker;
-      this.addkechengform.data[0].ID_Speaker_NoUser =
-        this.kechengform.ID_Speaker_NoUser * 1;
-      let that = this;
-      //执行Axios请求
-      axios({url:"/api/" + "model_curricula/",
-        method:'post',
-        headers:{
-        'accept': "application/json",
-        'Authorization':'Bearer'+" "+this.webtoken
-      },
-      data:this.addkechengform,
-      })
-        .then(res => {
-          //执行成功
-          if (true) {
-            //res.data.code == 1
-            // //获取所有课程信息
-            // that.kecheng = res.data.data;
-            // //获取记录条数
-            // that.total = res.data.data.length;
-            // //获取分页信息
-            // that.getpagekecheng();
-            that.getkecheng();
-            //提示
-            that.$message({
-              message: "数据加载成功！",
-              type: "success"
-            });
-            //关闭窗体
-            that.closeDialogForm("kechengform");
-          } else {
-            //失败提示
-            that.$message.error(res.data.error_message);
-          }
-        })
-        .catch(err => {
-          //执行失败
-          console.log(err);
-          that.$message.error("获取后端结果出现异常");
-        });
-    },
-    //修改更新到数据库
-    submitupdatekecheng() {
-      this.updatekechengform.data[0].ID = this.kechengform.ID * 1;
-      this.updatekechengform.data[0].Rem = this.kechengform.Rem;
-      this.updatekechengform.data[0].Introduction = this.kechengform.Introduction;
-      this.updatekechengform.data[0].ID_Location =
-        this.kechengform.ID_Location * 1;
-      this.updatekechengform.data[0].ID_Speaker =
-        this.kechengform.ID_Speaker * 1;
-      this.updatekechengform.data[0].TimeBegin = changetime1(
-        this.kechengform.TimeBegin
-      );
-      this.updatekechengform.data[0].TimeEnd = changetime1(
-        this.kechengform.TimeEnd
-      );
-      this.updatekechengform.data[0].Name = this.updatekechengform.Name;
-      this.updatekechengform.data[0].Attr = this.kechengform.Attr * 1;
-      this.updatekechengform.data[0].Charge = this.kechengform.Charge * 1;
-      this.updatekechengform.data[0].PwAccess = this.kechengform.PwAccess * 1;
-      this.updatekechengform.data[0].PwContinuous =
-        this.kechengform.PwContinuous * 1;
-      this.updatekechengform.data[0].PwDirection =
-        this.kechengform.PwDirection * 1;
-      this.updatekechengform.data[0].DoorOpen = this.kechengform.DoorOpen * 1;
-      this.updatekechengform.data[0].TimeBeginCheckBegin =
-        this.kechengform.TimeBeginCheckBegin * 1;
-      this.updatekechengform.data[0].TimeBeginCheckEnd =
-        this.kechengform.TimeBeginCheckEnd * 1;
-      this.updatekechengform.data[0].TimeEndCheckBegin =
-        this.kechengform.TimeEndCheckBegin * 1;
-      this.updatekechengform.data[0].TimeEndCheckEnd =
-        this.kechengform.TimeEndCheckEnd * 1;
-      this.updatekechengform.data[0].RangeUsers = this.kechengform.RangeUsers;
-      this.updatekechengform.data[0].ListDepts = this.kechengform.ListDepts;
-      this.updatekechengform.data[0].RangeEqus = this.kechengform.RangeEqus;
-      this.updatekechengform.data[0].ListPlaces = this.kechengform.ListPlaces;
-      this.updatekechengform.data[0].MapUser2Equ = this.kechengform.MapUser2Equ;
-      this.updatekechengform.data[0].AboutSpeaker = this.kechengform.AboutSpeaker;
-      this.updatekechengform.data[0].ID_Speaker_NoUser =
-        this.kechengform.ID_Speaker_NoUser * 1;
-      let that = this;
-      //执行Axios请求
-      axios
-        ({url:"/api/" + "model_curricula/", 
-        method:'put',
-        headers:{
-        'accept': "application/json",
-        'Authorization':'Bearer'+" "+this.webtoken
-      },
-        data:that.updatekechengform}).then(res => {
-          //执行成功
-          if (true) {
-            //res.data.code == 1
-            // //获取所有课程信息
-            // that.kecheng = res.data.data;
-            // //获取记录条数
-            // that.total = res.data.data.length;
-            // //获取分页信息
-            // that.getpagekecheng();
-            that.getkecheng();
-            //提示
-            that.$message({
-              message: "数据修改成功！",
-              type: "success"
-            });
-            //关闭窗体
-            that.closeDialogForm("kechengform");
-          } else {
-            //失败提示
-            that.$message.error(res.data.error_message);
-          }
-        })
-        .catch(err => {
-          //执行失败
-          console.log(err);
-          that.$message.error("获取后端结果出现异常！");
-        });
-    },
-    //删除一条课程信息
-    deletekecheng(row) {
-      //等待确认
-      this.$confirm(
-        "是否确认删除课程信息【课程ID：" +
-          row.ID +
-         +
-          "】信息？",
-        "提示",
-        {
-          confirmButtonText: "确定删除",
-          cancelButtonText: "取消",
-          type: "warning"
-        }
-      )
-        .then(() => {
-          //确认删除响应事件
-          let that = this;
-          //调用后端接口
-          axios
-            ({url:"/api/" + "model_curricula/", 
-        method:'delete',
-        headers:{
-        'accept': "application/json",
-        'Authorization':'Bearer'+" "+this.webtoken
-      },
-        data:{ "data": [{ 'ID': row.ID }],'n':1 }
-        })
-            .then(res => {
-              if (true) {
-                // //获取所有课程信息
-                // that.kecheng = res.data.data;
-                // //获取记录数
-                // that.total = res.data.data.length;
-                // //分页
-                // that.getpagekecheng();
-                that.getkecheng();
-                //提示
-                that.$message({
-                  message: "数据删除成功！",
-                  type: "success"
-                });
-              } else {
-                that.$message.error("数据删除失败！");
-              }
-            });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-        });
-    },
-    //批量删除课程信息
-    deletekechengs() {
-      //等待确认
-      this.$confirm(
-        "是否确认批量删除" + this.selectkechengs.length + "个课程信息吗？",
-        "提示",
-        {
-          confirmButtonText: "确定删除",
-          cancelButtonText: "取消",
-          type: "warning"
-        }
-      )
-        .then(() => {
-          let data = [];
-          for (var i = 0; i < this.selectkechengs.length; i++) {
-            data.push({ ID: this.selectkechengs[i].ID * 1 });
-          }
-          //确认删除响应事件
-          let that = this;
-          //调用后端接口
-          axios
-             ({url:"/api/" + "model_curricula/", 
-        method:'delete',
-        headers:{
-        'accept': "application/json",
-        'Authorization':'Bearer'+" "+this.webtoken
-      },
-        data:{
-              data,
-              n: this.selectkechengs.length
-            }
-        })
-            .then(res => {
-              if (true) {
-                // //获取所有课程信息
-                // that.kecheng = res.data.data;
-                // //获取记录数
-                // that.total = res.data.data.length;
-                // //分页
-                // that.getpagekecheng();
-                that.getkecheng();
-                //提示
-                that.$message({
-                  message: "数据批量删除成功！",
-                  type: "success"
-                });
-              } else {
-                that.$message.error("数据批量删除失败！");
-              }
-            });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-        });
-    }
   }
 };
 </script>

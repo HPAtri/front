@@ -1,14 +1,3 @@
-<!--
-//  @Author           : Albert Wang
-//  @Copyright Notice : Copyright (c) 2022 Albert Wang 王子睿, All Rights Reserved.
-//  @Time             : 2022-03-10 12:29:11
-//  @Description      :
-//  @Email            : shadowofgost@outlook.com
-//  @FilePath         : /WebBackendc:/Users/shado/Desktop/Desktop/Documents/ComputerProgramme/Code/front/src/views/login/loginMain.vue
-//  @LastAuthor       : Albert Wang
-//  @LastTime         : 2022-03-10 14:38:52
-//  @Software         : Vscode
--->
 <template>
   <div>
     <el-form
@@ -128,7 +117,7 @@ export default {
           let that = this; //记录this的地址
 
           //使用Axios实现Ajax的请求
-          let data = qs.stringify({username:'1817439014',password:'125327'})
+          let data = qs.stringify({username:this.loginForm.user_id,password:this.loginForm.password})
 
           axios({
               method:'post',

@@ -8,30 +8,31 @@
                     <i class="el-icon-s-platform"></i>
                     <span slot="title"> 设备管理</span>
                 </el-menu-item>
-                <el-submenu index="1">
-                    <template slot="title"><i class="el-icon-user-solid"></i>
-                        <span>用户管理</span>
-                    </template>
-                        <el-menu-item index="1-1" :route="{name:'教师信息管理'}">教师信息管理</el-menu-item>
-                        <el-menu-item index="1-2" :route="{name:'学生信息管理'}">学生信息管理</el-menu-item>
-                </el-submenu>
+                <el-menu-item index="1" :route="{name:'用户管理'}">
+                    <i class="el-icon-user-solid"></i>
+                    <span slot="title"> 用户管理</span>
+                </el-menu-item>
                 <el-menu-item index="2" :route="{name:'课程管理'}">
                     <i class="el-icon-document"></i>
                     <span slot="title"> 课程管理</span>
                 </el-menu-item>
-                <el-menu-item index="3" :route="{name:'签到管理'}">
+                <el-menu-item index="3" :route="{name:'课程安排'}">
+                    <i class="el-icon-document"></i>
+                    <span slot="title"> 课程安排</span>
+                </el-menu-item>
+                <el-menu-item index="4" :route="{name:'签到管理'}">
                     <i class="el-icon-document-checked"></i>
                     <span slot="title"> 签到管理</span>
                 </el-menu-item>
-                <el-menu-item index="4" :route="{name:'部门管理'}">
+                <el-menu-item index="5" :route="{name:'部门管理'}">
                     <i class="el-icon-s-cooperation"></i>
                     <span slot="title"> 部门管理</span>
                 </el-menu-item>
-                <el-menu-item index="5" :route="{name:'位置管理'}">
+                <el-menu-item index="6" :route="{name:'位置管理'}">
                     <i class="el-icon-s-grid"></i>
                     <span slot="title"> 位置管理</span>
                 </el-menu-item>
-                <el-menu-item index="6" :route="{name:'管理员个人中心'}">
+                <el-menu-item index="7" :route="{name:'管理员个人中心'}">
                     <i class="el-icon-user"></i>
                     <span slot="title"> 个人中心</span>
                 </el-menu-item>

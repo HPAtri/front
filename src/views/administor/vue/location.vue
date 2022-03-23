@@ -39,6 +39,7 @@
     <el-table
       :data="pagelocation"
       border
+      height="400"
       style="width: 90%;margin-left:20px"
       size="mini"
       @selection-change="handleSelectionChange"
@@ -54,25 +55,30 @@
       </el-table-column>
       <el-table-column prop="ID" label="位置ID" width="120" align="center">
       </el-table-column>
-      <el-table-column prop="name" label="位置编号" width="140" align="center">
-      </el-table-column>
       <el-table-column
-        prop="TimeBegin"
-        label="开始时间"
+        prop="Name"
+        label="位置名称"
         width="140"
         align="center"
       >
       </el-table-column>
       <el-table-column
-        prop="TimeEnd"
-        label="结束时间"
+        prop="ID_Parent"
+        label="上级位置"
         width="140"
         align="center"
       >
       </el-table-column>
       <el-table-column
-        prop="ID_Location__name"
-        label="地点id"
+        prop="ID_Manager_Name"
+        label="修改者名字"
+        width="140"
+        align="center"
+      >
+      </el-table-column>
+            <el-table-column
+        prop="IdManager"
+        label="最后操作人ID"
         width="140"
         align="center"
       >
@@ -616,7 +622,7 @@ export default {
         if (valid) {
           //校验成功后执行添加或者修改
           if (this.isEdit) {
-            this.submitupdatalocation();
+            this.submitupdatelocation();
           } else {
             //添加
             this.submitaddlocation();
@@ -634,7 +640,6 @@ export default {
       this.addlocationform.data[0].Introduction = this.locationform.Introduction;
       this.addlocationform.data[0].ID_Parent = this.locationform.ID_Parent * 1;
       this.addlocationform.data[0].Name = this.locationform.Name;
-      this.timeup1();
       let that = this;
       //执行Axios请求
       axios
@@ -648,13 +653,6 @@ export default {
       }).then(res => {
           //执行成功
           if (true) {
-            //res.data.code == 1
-            // //获取所有位置信息
-            // that.location = res.data.data;
-            // //获取记录条数
-            // that.total = res.data.data.length;
-            // //获取分页信息
-            // that.getpagelocation();
             that.getlocation();
             //提示
             that.$message({
@@ -675,14 +673,12 @@ export default {
         });
     },
     //修改更新到数据库
-    submitupdatalocation() {
-      (this.updatelocationform.data[0].ID = this.locationform.ID * 1),
-        (this.updatelocationform.data[0].Rem = this.locationform.Rem),
-        (this.updatelocationform.data[0].Introduction = this.locationform.Introduction),
-        (this.updatelocationform.data[0].ID_Parent =
-          this.locationform.ID_Parent * 1),
-        (this.updatelocationform.data[0].Name = this.locationform.Name),
-        this.timeup2();
+    submitupdatelocation() {
+      this.updatelocationform.data[0].ID = this.locationform.ID * 1,
+      this.updatelocationform.data[0].Rem = this.locationform.Rem,
+      this.updatelocationform.data[0].Introduction = this.locationform.Introduction,
+      this.updatelocationform.data[0].ID_Parent =this.locationform.ID_Parent * 1,
+      this.updatelocationform.data[0].Name = this.locationform.Name;
       let that = this;
       //执行Axios请求
       axios

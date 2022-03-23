@@ -38,6 +38,7 @@
     </el-form>
     <el-table
       :data="pageshebei"
+      height="400"
       border
       style="width: 90%;margin-left:20px"
       size="mini"
@@ -55,6 +56,13 @@
       <el-table-column prop="ID" label="设备ID" width="120" align="center">
       </el-table-column>
       <el-table-column
+        prop="Name"
+        label="设备名称"
+        width="140"
+        align="center"
+      >
+      </el-table-column>
+      <el-table-column
         prop="ID_Location"
         label="设备所在地点"
         width="140"
@@ -63,14 +71,7 @@
       </el-table-column>
       <el-table-column
         prop="ID_IP"
-        label="设备的ip地址"
-        width="140"
-        align="center"
-      >
-      </el-table-column>
-      <el-table-column
-        prop="timeupdate"
-        label="更新时间"
+        label="设备的IP地址"
         width="140"
         align="center"
       >
@@ -78,13 +79,6 @@
       <el-table-column
         prop="PortListen"
         label="数据端口"
-        width="140"
-        align="center"
-      >
-      </el-table-column>
-      <el-table-column
-        prop="type_field"
-        label="刷卡器类型"
         width="140"
         align="center"
       >
@@ -752,7 +746,7 @@ export default {
             KeyOk: ""
           }
         ],
-        n: 0
+        n: 1
       },
       updateshebeiform: {
         data: [
@@ -788,7 +782,7 @@ export default {
             KeyOk: ""
           }
         ],
-        n: 0
+        n: 1
       },
     searchform:{
   requires: {
@@ -1187,7 +1181,7 @@ export default {
             this.shebeiform.ID = Number(this.shebeiform.ID);
             this.timeup();
             this.datatrans2();
-            this.submitupdatashebei();
+            this.submitupdateshebei();
           } else {
             //添加
             this.shebeiform.ID = Number(this.shebeiform.ID);
@@ -1265,14 +1259,13 @@ export default {
             //失败提示
           }
         })
-        .catch(res => {
+        .catch(function(err){
           //执行失败
           errcatch(err);
-          that.$message.error("后端数据异常！");
         });
     },
     //修改更新到数据库
-    submitupdatashebei() {
+    submitupdateshebei() {
       this.updateshebeiform.data[0].Class_field = this.shebeiform.Class_field*1;
       this.updateshebeiform.data[0].ID = this.shebeiform.ID * 1;
       this.updateshebeiform.data[0].Rem = this.shebeiform.Rem;

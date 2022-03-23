@@ -38,6 +38,7 @@
     </el-form>
     <el-table
       :data="pagedepartment"
+      height="400"
       border
       style="width: 90%;margin-left:20px"
       size="mini"
@@ -54,25 +55,25 @@
       </el-table-column>
       <el-table-column prop="ID" label="部门ID" width="120" align="center">
       </el-table-column>
-      <el-table-column prop="name" label="部门编号" width="140" align="center">
+      <el-table-column prop="Name" label="部门编号" width="140" align="center">
       </el-table-column>
       <el-table-column
-        prop="TimeBegin"
-        label="开始时间"
+        prop="ID_Parent"
+        label="父级部门"
         width="140"
         align="center"
       >
       </el-table-column>
-      <el-table-column
-        prop="TimeEnd"
-        label="结束时间"
+            <el-table-column
+        prop="IdManager"
+        label="最后操作人ID"
         width="140"
         align="center"
       >
       </el-table-column>
-      <el-table-column
-        prop="ID_Location__name"
-        label="地点id"
+           <el-table-column
+        prop="IMark"
+        label="存在标记"
         width="140"
         align="center"
       >
@@ -396,7 +397,7 @@ export default {
             Name2: ""
           }
         ],
-        n: 0
+        n: 1
       },
       updatedepartmentform: {
         data: [
@@ -409,7 +410,7 @@ export default {
             Name2: ""
           }
         ],
-        n: 0
+        n: 1
       }
     };
   },
@@ -632,7 +633,7 @@ export default {
         if (valid) {
           //校验成功后执行添加或者修改
           if (this.isEdit) {
-            this.submitupdatadepartment();
+            this.submitupdatedepartment();
           } else {
             //添加
             this.submitadddepartment();
@@ -664,13 +665,6 @@ export default {
       }).then(res => {
           //执行成功
           if (true) {
-            //res.data.code == 1
-            // //获取所有部门信息
-            // that.department = res.data.data;
-            // //获取记录条数
-            // that.total = res.data.data.length;
-            // //获取分页信息
-            // that.getpagedepartment();
             that.getdepartment();
             //提示
             that.$message({
@@ -691,7 +685,7 @@ export default {
         });
     },
     //修改更新到数据库
-    submitupdatadepartment() {
+    submitupdatedepartment() {
       this.updatedepartmentform.data[0].ID = this.departmentform.ID * 1;
       this.updatedepartmentform.data[0].Rem = this.departmentform.Rem;
       this.updatedepartmentform.data[0].Introduction = this.departmentform.Introduction;

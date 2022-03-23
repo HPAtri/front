@@ -1,14 +1,3 @@
-<!--
-//  @Author           : Albert Wang
-//  @Copyright Notice : Copyright (c) 2022 Albert Wang 王子睿, All Rights Reserved.
-//  @Time             : 2022-03-10 12:29:11
-//  @Description      :
-//  @Email            : shadowofgost@outlook.com
-//  @FilePath         : /WebBackendc:/Users/shado/Desktop/Desktop/Documents/ComputerProgramme/Code/front/src/views/administor/vue/apersion.vue
-//  @LastAuthor       : Albert Wang
-//  @LastTime         : 2022-03-10 16:09:15
-//  @Software         : Vscode
--->
 <template>
   <div>
     <el-form
@@ -24,7 +13,7 @@
             style="margin-left:200px;"
             action="http://localhost:85/polls/Picture/"
             :auto-upload="true"
-            :data="uploadData"
+            :data="userform"
             :http-request="imageChange"
             :beforeUpload="beforeAvatarUpload"
             accept=".jpg"
@@ -337,7 +326,7 @@
               type="primary"
               style="margin-left:200px;"
               size="medium"
-              @click="IDltpwd()"
+              @click="submituserform()"
               >保 存</el-button
             >
           </el-form-item>
@@ -356,11 +345,9 @@ export default {
       dialogImageUrl: "",
       dialogVisible: false,
       loading: false,
-      //baseURL: "/api/",
-      uploadData: {
-        pic: {},
-        user_ID: ""
-      },
+      isView:true,
+      baseURL: "/api/",
+      webtoken:localStorage.getItem("token"),
       userform: {
         ID: "",
         Rem: "",
@@ -382,8 +369,35 @@ export default {
         Phone: "",
         Yue: "",
         Yue2: "",
-        LocalID: ""
+        LocalID: "",
+        ID_Manager_Name: "",
       },
+      updateuserform:{
+      "data": [
+        {
+          ID: 0,
+          Rem: "string",
+          Introduction: "string",
+          Deptid: 0,
+          NoCard: "string",
+          NoUser: "string",
+          NoSfz: 0,
+          Name: "string",
+          Psw: "string",
+          Sex: 0,
+          Attr: 0,
+          AttrJf: 0,
+          Power: 0,
+          PowerJf: 0,
+          Email: "string",
+          Phone: 0,
+          Yue: 0,
+          Yue2: 0,
+          LocalID: "string"
+    }
+  ],
+  "n": 0
+},
       rules: {
         psw: [{ required: true, message: "密码不允许为空", trigger: "blur" }]
       }
@@ -408,24 +422,31 @@ export default {
     getuser() {
       let that = this;
       axios
-        .get("/api/" + "PersonInformation/")
-        .then(function(res) {
+        ({url:"/api/" + "model_user/current_user",
+        method:'get',
+        headers:{
+        'accept': "application/json",
+        'Authorization':'Bearer'+" "+this.webtoken
+      }
+      }).then(function(res) {
           //请求成功后执行的函数
-          console.log(res);
           if (res.data.code == 0) {
             that.$router.push("/index");
           } else {
             if (true) {
               //res.data.code == 1
               //把数据给userform
-              that.userform = res.data.data[0];
+              that.userform = res.data;
               if (that.userform.Attr == 2) {
                 that.userform.Attr = "超级管理员";
               } else if (that.userform.Attr == 1) {
                 that.userform.Attr = "管理员";
               } else if (that.userform.Attr == 0) {
                 that.userform.Attr = "普通用户";
+              }else if (that.userform.Attr == 3) {
+                that.userform.Attr = "学生";
               }
+
               if (that.userform.sex == 0) {
                 that.userform.sex = "女性";
               } else {
@@ -462,19 +483,19 @@ export default {
       return isJPG;
     },
     // 提交图片
-    imageChange(param, type, file) {
+    imageChange(param,file) {
       let formData = new FormData();
-      formData.append("Rem", that.userform.Rem);
-      formData.append("Introduction", that.userform.Introduction);
-      formData.append("NoUser", that.userform.NoUser);
-      formData.append("NoSfz", that.userform.NoSfz);
-      //   formData.append("FaceFearture", that.userform.FaceFearture);
-      //   formData.append("Photo",that.userform.Photo,);
-      formData.append("Photo_dataF", param.file);
-
-      this.$http
-        .post("http://localhost:85/polls/Picture/", formData)
-        .then(res => {
+      formData.append('ID',this.userform.ID),
+      formData.append('NoUser',this.userform.NoUser),
+      formData.append('file',param.file),
+      axios({url:"/api/" + "model_userextension/"+'?ID='+this.userform.ID+'&NoUser='+this.userform.NoUser,
+        method:'post',
+        headers:{
+        'accept': "application/json",
+        'Content-Type': 'multipart/form-data',
+        'Authorization':'Bearer'+" "+this.webtoken
+      },data:formData
+      }).then(res => {
           this.$message.success("上传成功");
         })
         .catch(err => {
@@ -483,10 +504,55 @@ export default {
     },
     submituserform() {
       let that = this;
+      this.updateuserform.data[0].ID=this.userform.ID*1;
+      this.updateuserform.data[0].Rem=this.userform.Rem;
+      this.updateuserform.data[0].Introduction=this.userform.Introduction;
+      this.updateuserform.data[0].Deptid=this.userform.Deptid*1;
+      this.updateuserform.data[0].NoCard=this.userform.NoCard;
+      this.updateuserform.data[0].NoUser=this.userform.NoUser;
+      this.updateuserform.data[0].NoSfz=this.userform.NoSfz*1;
+      this.updateuserform.data[0].Name=this.userform.Name;
+      this.updateuserform.data[0].Psw=this.userform.Psw;
+      this.updateuserform.data[0].Sex=this.userform.Sex;
+      this.updateuserform.data[0].Attr=this.userform.Attr;
+      this.updateuserform.data[0].AttrJf=this.userform.AttrJf;
+      this.updateuserform.data[0].Power=this.userform.Power*1;
+      this.updateuserform.data[0].PowerJf=this.userform.PowerJf*1;
+      this.updateuserform.data[0].Email=this.userform.Email;
+      this.updateuserform.data[0].Phone=this.userform.Phone*1;
+      this.updateuserform.data[0].Yue=this.userform.Yue*1;
+      this.updateuserform.data[0].Yue2=this.userform.Yue2*1;
+      this.updateuserform.data[0].LocalID=this.userform.LocalID;
+      if (this.updateuserform.data[0].Attr == "超级管理员") {
+              this.updateuserform.data[0].Attr = 2;
+      } else if (this.updateuserform.data[0].Attr == "管理员") {
+        this.updateuserform.data[0].Attr = 1;
+      } else if (this.updateuserform.data[0].Attr == "普通用户") {
+        this.updateuserform.data[0].Attr = 0;
+      }else if (this.updateuserform.data[0].Attr == "学生") {
+        this.updateuserform.data[0].Attr = 3;
+      };
+      if (this.updateuserform.data[0].Attr == "超级管理员") {
+        this.updateuserform.data[0].Attr = 2;
+      } else if (this.updateuserform.data[0].Attr == "管理员") {
+        this.updateuserform.data[0].Attr = 1;
+      } else if (this.updateuserform.data[0].Attr == "普通用户") {
+        this.updateuserform.data[0].Attr = 0;
+      };
+      if (this.updateuserform.data[0].sex == "女性") {
+        this.updateuserform.data[0].sex = 0;
+      } else {
+        this.updateuserform.data[0].sex = 1;
+      };
       this.timeup();
-      axios
-        .put("/api/" + "TeachersInformation/", that.userform)
-        .then(res => {
+      axios({url:"/api/" + "model_user/",
+        method:'put',
+        headers:{
+        'accept': "application/json",
+        'Authorization':'Bearer'+" "+this.webtoken
+      },
+      data:this.updateuserform,
+      }).then(res => {
           //执行成功
           if (true) {
             //res.data.code == 1
@@ -504,34 +570,6 @@ export default {
           console.log("保存失败！");
         });
     }
-  },
-  submitpic() {
-    let that = this;
-    this.timeup();
-    axios
-      .patch("/api/" + "PersonInformation/", {
-        Rem: that.userform.Rem,
-        Introduction: that.userform.Introduction,
-        NoUser: that.userform.NoUser,
-        NoSfz: that.userform.NoSfz,
-        FaceFearture: that.userform.FaceFearture,
-        Photo: that.userform.Photo,
-        Photo_dataF: that.userform.Photo_dataF
-      })
-      .then(res => {
-        //执行成功
-        if (true) {
-          //res.data.code == 1
-          that.getuser();
-        } else {
-          //数据加载失败提示
-          that.$message.error(res.data.msg);
-        }
-      })
-      .catch(function(err) {
-        //请求失败后执行的函数
-        console.log("保存失败！");
-      });
   }
 };
 </script>
