@@ -6,7 +6,7 @@
           <el-form-item label="请输入筛选条件：">
             <el-input
               v-model="input_string"
-              placeholder="输入筛选条件"
+              placeholder="输入设备ID"
               style="width: 420px;"
             >
             </el-input>
@@ -23,7 +23,7 @@
             <el-button
               type="primary"
               icon="el-icon-tickets"
-              @click="getshebei()"
+              @click="getshebei2()"
               >全部</el-button
             >
             <el-button
@@ -151,11 +151,11 @@
       >
         <el-form-item
           label="设备种类"
-          prop="Class_field"
+          prop="Class"
           v-if="adddialog || viewdialog || updatedialog || deletedialog"
         >
           <el-select
-            v-model="shebeiform.Class_field"
+            v-model="shebeiform.Class"
             :disabled="isView"
             placeholder="请选择设备种类"
           >
@@ -167,7 +167,7 @@
         <el-form-item
           label="ID"
           prop="ID"
-          v-if="adddialog || viewdialog || updatedialog || deletedialog"
+          v-if="viewdialog || updatedialog || deletedialog"
         >
           <el-input
             v-model="shebeiform.ID"
@@ -560,7 +560,7 @@ export default {
       pagesize: 10, //每行显示多少页
       dialogVisible: false,
       shebeiform: {
-        Class_field: "",
+        Class: "",
         ID: "",
         Rem: "",
         Introduction: "",
@@ -592,7 +592,7 @@ export default {
         KeyOk: ""
       },
       rules: {
-        Class_field: [
+        Class: [
           { required: true, message: "设备种类不能为空", trigger: "blur" },
           // { validator: rulesID, trigger: "blur" }
         ],
@@ -716,7 +716,7 @@ export default {
       addshebeiform: {
         data: [
           {
-            Class_field: "",
+            Class: "",
             Rem: "",
             Introduction: "",
             ID_Location: "",
@@ -751,7 +751,7 @@ export default {
       updateshebeiform: {
         data: [
           {
-            Class_field: "",
+            Class: "",
             ID: "",
             Rem: "",
             Introduction: "",
@@ -785,39 +785,7 @@ export default {
         n: 1
       },
     searchform:{
-  requires: {
-    Class_field: 0,
-    ID: 0,
-    Rem: "string",
-    Introduction: "string",
-    TimeUpdate: 0,
-    IdManager: 0,
-    ID_Location: 0,
-    ID_User: 0,
-    Name: "string",
-    ID_Location_SN: 0,
-    ID_IP: "string",
-    MAC: "string",
-    State: 0,
-    Login: 0,
-    Link: 0,
-    Dx: 0,
-    Dy: 0,
-    iTimeBegin: 0,
-    iTimeLogin: 0,
-    WhiteList: "string",
-    PortListen: 0,
-    Type: 0,
-    TimeDelay: 0,
-    KeyCancel: 0,
-    KeyDel: 0,
-    KeyF1: 0,
-    OnAll: 0,
-    RangeEqus: "string",
-    ListPlaces: "string",
-    ID_Plan: 0,
-    KeyOk: 0
-  },
+  requires: {},
   service_type: 0,
   page: 1,
   size: 5
@@ -865,12 +833,12 @@ export default {
         row.OnAll = "校验成功后开门";
       }
 
-      if (row.Class_field == 0) {
-        row.Class_field = "PC设备";
-      } else if (row.Class_field == 2) {
-        row.Class_field = "刷卡门禁设备";
+      if (row.Class == 0) {
+        row.Class = "PC设备";
+      } else if (row.Class == 2) {
+        row.Class = "刷卡门禁设备";
       } else {
-        row.Class_field = "服务器设备";
+        row.Class = "服务器设备";
       }
     },
 
@@ -904,13 +872,17 @@ export default {
         this.shebeiform.Link = 1;
       }
 
-      if (this.shebeiform.Class_field == "PC设备") {
-        this.shebeiform.Class_field = 0;
-      } else if (this.shebeiform.Class_field == "刷卡门禁设备") {
-        this.shebeiform.Class_field = 2;
+      if (this.shebeiform.Class == "PC设备") {
+        this.shebeiform.Class = 0;
+      } else if (this.shebeiform.Class == "刷卡门禁设备") {
+        this.shebeiform.Class = 2;
       } else {
-        this.shebeiform.Class_field = 1;
+        this.shebeiform.Class = 1;
       }
+    },
+    getshebei2(){
+      this.searchform.service_type=0,
+      this.getshebei()
     },
     //获取所有设备信息
     getshebei: function() {
@@ -978,7 +950,7 @@ export default {
     queryshebei() {
       //使用Ajax请求--POST-->传递input_string
       let that = this;
-      this.searchform.service_type=1;
+      this.searchform.service_type=3;
       this.searchform['requires'].ID=this.input_string*1;
       //开始Ajax请求
       axios(
@@ -991,12 +963,6 @@ export default {
         data:that.searchform})
         .then(function(res) {
           if (true) {
-            //把数据给shebei
-            //that.shebei = res.data.data;
-            //获取返回记录的总行数
-            //that.total = res.data.data.length;
-            //获取当前页的数据
-            //that.getpageshebei();
             that.getshebei();
             //数据加载成功提示
             that.$message({
@@ -1057,7 +1023,7 @@ export default {
       this.shebeiform.State = "";
       this.shebeiform.Login = "";
       this.shebeiform.Link = "";
-      this.shebeiform.Class_field = "";
+      this.shebeiform.Class = "";
       this.shebeiform.Dx = "";
       this.shebeiform.Dy = "";
       this.shebeiform.ID_Plan = "";
@@ -1075,7 +1041,7 @@ export default {
       this.shebeiform.OnAll = "";
       this.shebeiform.RangeEqus = "";
       this.shebeiform.ListPlaces = "";
-      this.addshebeiform.data[0].Class_field = "";
+      this.addshebeiform.data[0].Class = "";
       this.addshebeiform.data[0].Rem = "";
       this.addshebeiform.data[0].Introduction = "";
       this.addshebeiform.data[0].ID_Location = "";
@@ -1103,7 +1069,7 @@ export default {
       this.addshebeiform.data[0].ListPlaces = "";
       this.addshebeiform.data[0].ID_Plan = "";
       this.addshebeiform.data[0].KeyOk = "";
-      this.updateshebeiform.data[0].Class_field = "";
+      this.updateshebeiform.data[0].Class = "";
       this.updateshebeiform.data[0].ID = "";
       this.updateshebeiform.data[0].Rem = "";
       this.updateshebeiform.data[0].Introduction = "";
@@ -1199,7 +1165,7 @@ export default {
 
     //添加到数据库的函数
     submitaddshebei() {
-      this.addshebeiform.data[0].Class_field = this.shebeiform.Class_field * 1;
+      this.addshebeiform.data[0].Class = this.shebeiform.Class * 1;
       this.addshebeiform.data[0].Rem = this.shebeiform.Rem;
       this.addshebeiform.data[0].Introduction = this.shebeiform.Introduction;
       this.addshebeiform.data[0].ID_Location = this.shebeiform.ID_Location * 1;
@@ -1266,7 +1232,7 @@ export default {
     },
     //修改更新到数据库
     submitupdateshebei() {
-      this.updateshebeiform.data[0].Class_field = this.shebeiform.Class_field*1;
+      this.updateshebeiform.data[0].Class = this.shebeiform.Class*1;
       this.updateshebeiform.data[0].ID = this.shebeiform.ID * 1;
       this.updateshebeiform.data[0].Rem = this.shebeiform.Rem;
       this.updateshebeiform.data[0].Introduction = this.shebeiform.Introduction;

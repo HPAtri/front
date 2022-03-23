@@ -6,7 +6,7 @@
           <el-form-item label="请输入筛选条件：">
             <el-input
               v-model="input_string"
-              placeholder="输入筛选条件"
+              placeholder="输入部门ID"
               style="width: 420px;"
             >
             </el-input>
@@ -23,7 +23,7 @@
             <el-button
               type="primary"
               icon="el-icon-tickets"
-              @click="getdepartment()"
+              @click="getdepartment2()"
               >全部</el-button
             >
             <el-button
@@ -364,14 +364,6 @@ export default {
       },
       searchform:{
       requires: {
-        ID: 0,
-        Rem: "",
-        Introduction: "",
-        TimeUpdate: 0,
-        IdManager: 0,
-        ID_Parent: 0,
-        Name: "",
-        Name2: ""
       },
       service_type: 0,
       page: 1,
@@ -436,13 +428,16 @@ export default {
       // })},500);
       this.$router.push({ path: "/qiandao?index=" + row.ID });
     },
+      getdepartment(){
+      this.searchform.service_type=0,
+      this.getdepartment()
+    },
     //获取所有设备信息
     getdepartment: function() {
       //记录this的地址
       let that = this;
       this.searchform.size=this.pagesize;
       this.searchform.page=this.currentpage;
-      this.searchform.service_type=0;
       //使用Axios实现Ajax请求
       axios
         ({url:"/api/" + "model_department/search",
@@ -500,7 +495,7 @@ export default {
     //实现当前页的设备信息筛选
     querydepartment() {
       let that = this;
-      this.searchform.service_type=1;
+      this.searchform.service_type=3;
       this.searchform['requires'].ID=this.input_string*1;
       //开始Ajax请求
       axios //Axios请求
@@ -514,12 +509,6 @@ export default {
       })
         .then(function(res) {
           if (true) {
-            //把数据给shebei
-            //that.department = res.data.data;
-            //获取返回记录的总行数
-            //that.total = res.data.data.length;
-            //获取当前页的数据
-            //that.getpagedepartment();
             that.getdepartment();
             //数据加载成功提示
             that.$message({

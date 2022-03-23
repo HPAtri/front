@@ -93,12 +93,12 @@ export default new Router({
      children:[
        {
          path:'/kechengt',
-         name:'老师课程管理',
+         name:'教师课程管理',
          component:kechengt,
        },
        {
          path:'/courseplant',
-         name:'老师课程安排',
+         name:'教师课程安排',
          component:courseplant,
        },
        {
@@ -108,7 +108,7 @@ export default new Router({
        },
        {
          path:'/tpersion',
-         name:'老师个人中心',
+         name:'教师个人中心',
          component:tperson,
        },
        {
@@ -139,7 +139,7 @@ export default new Router({
         },
         {
           path:'/qiandaost',
-          name:'课程签到详情',
+          name:'学生签到详情',
           component:qiandaost,
         },
         {

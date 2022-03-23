@@ -6,7 +6,7 @@
           <el-form-item label="请输入筛选条件：">
             <el-input
               v-model="input_string"
-              placeholder="输入筛选条件"
+              placeholder="输入课程ID"
               style="width: 420px;"
             >
             </el-input>
@@ -23,7 +23,7 @@
             <el-button
               type="primary"
               icon="el-icon-tickets"
-              @click="getkecheng()"
+              @click="getkecheng2()"
               >全部</el-button
             >
             <el-button
@@ -153,7 +153,7 @@
         <el-form-item
           label="课程ID"
           prop="ID"
-          v-if="adddialog || viewdialog || updatedialog || deletedialog"
+          v-if="viewdialog || updatedialog || deletedialog"
         >
           <el-input
             v-model="kechengform.ID"
@@ -194,17 +194,6 @@
         >
           <el-input
             v-model="kechengform.Name"
-            :disabled="isView"
-            suffix-icon="el-icon-edit"
-          ></el-input>
-        </el-form-item>
-        <el-form-item
-          label="ID序列"
-          prop="ID_Curricula"
-          v-if="adddialog || viewdialog || updatedialog || deletedialog"
-        >
-          <el-input
-            v-model="kechengform.ID_Curricula"
             :disabled="isView"
             suffix-icon="el-icon-edit"
           ></el-input>
@@ -521,7 +510,6 @@ export default {
         Rem: "",
         Introduction: "",
         Name:"",
-        ID_Curricula: "",
         ID_Location: "",
         ID_Speaker: "",
         TimeBegin: "",
@@ -549,9 +537,7 @@ export default {
           { required: true, message: "课程ID不能为空", trigger: "blur" },
           // { validator: rulesID, trigger: "blur" }
         ],
-        ID_Curricula: [
-          { required: true, message: "ID序列不能为空", trigger: "blur" }
-        ],
+
         ID_Location: [
           { required: true, message: "地点ID不能为空", trigger: "blur" }
         ],
@@ -585,6 +571,9 @@ export default {
         DoorOpen: [
           { required: true, message: "是否开门不能为空", trigger: "blur" }
         ],
+        ID_Speaker_NoUser: [
+          { required: true, message: "职工号为空填0", trigger: "blur" }
+        ],
         TimeBeginCheckBegin: [
           {
             required: true,
@@ -615,34 +604,7 @@ export default {
         ]
       },
       searchform:{
-    "requires": {
-          ID: 0,
-          Rem: "string",
-          Introduction: "string",
-          TimeUpdate: 0,
-          IdManager: 0,
-          Name: "string",
-          ID_Location: 0,
-          ID_Speaker: 0,
-          TimeBegin: 0,
-          TimeEnd: 0,
-          Attr: 0,
-          Charge: 0,
-          PwAccess: 0,
-          PwContinuous: 0,
-          PwDirection: 0,
-          DoorOpen: 0,
-          TimeBeginCheckBegin: 0,
-          TimeBeginCheckEnd: 0,
-          TimeEndCheckBegin: 0,
-          TimeEndCheckEnd: 0,
-          RangeUsers: "string",
-          ListDepts: "string",
-          RangeEqus: "string",
-          ListPlaces: "string",
-          MapUser2Equ: "string",
-          AboutSpeaker: "string"
-        },
+    "requires": {},
         service_type: 0,
         page: 1,
         size: 5
@@ -814,13 +776,16 @@ export default {
       localStorage.setItem("kecheng_ID",row.ID)
       this.$router.push({ path: "/courseplan"});
     },
+    getkecheng2(){
+      this.searchform.service_type=0;
+      this.getkecheng()
+     },
     //获取所有设备信息
     getkecheng: function() {
       //记录this的地址
       let that = this;
       this.searchform.size=this.pagesize;
       this.searchform.page=this.currentpage;
-      this.searchform.service_type=0;
       //使用Axios实现Ajax请求
       axios
         ({url:"/api/" + "model_curricula/search",
@@ -880,7 +845,7 @@ export default {
     querykecheng() {
       //使用Ajax请求--POST-->传递input_string
       let that = this;
-      this.searchform.service_type=1;
+      this.searchform.service_type=3;
       this.searchform['requires'].ID=this.input_string*1;
       //开始Ajax请求
       axios //Axios请求
@@ -947,7 +912,6 @@ export default {
       this.kechengform.ID = "";
       this.kechengform.Rem = "";
       this.kechengform.Introduction = "";
-      this.kechengform.ID_Curricula = "";
       this.kechengform.ID_Location = "";
       this.kechengform.ID_Speaker = "";
       this.kechengform.TimeBegin = "";

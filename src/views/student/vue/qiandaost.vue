@@ -3,18 +3,18 @@
     <el-form v-model="qiandaoform" :inline="true" style="margin-top:20px;">
       <el-row style="margin-left:20px;">
         <el-col :span="12">
-          <el-form-item label="请输入筛选条件：">
+          <!-- <el-form-item label="请输入筛选条件：">
             <el-input
               v-model="input_string"
-              placeholder="输入筛选条件"
+              placeholder="请输入查询ID"
               style="width: 420px;"
             >
-            </el-input>
-          </el-form-item>
+            </el-input> -->
+          <!-- </el-form-item> -->
         </el-col>
         <el-col :span="8" style="text-align: right;padding-right:10px;">
           <el-button-group>
-            <el-button
+            <!-- <el-button
               type="primary"
               icon="el-icon-search"
               @click="queryqiandao()"
@@ -23,7 +23,7 @@
             <el-button
               type="primary"
               icon="el-icon-tickets"
-              @click="getqiandao()"
+              @click="getqiandao2()"
               >全部</el-button
             >
             <el-button
@@ -31,7 +31,7 @@
               icon="el-icon-circle-plus-outline"
               @click="addqiandao()"
               >添加</el-button
-            >
+            > -->
           </el-button-group>
         </el-col>
       </el-row>
@@ -52,9 +52,9 @@
         fixed="left"
       >
       </el-table-column>
-      <el-table-column prop="ID" label="位置ID" width="120" align="center">
+      <el-table-column prop="ID_User" label="ID" width="115" align="center">
       </el-table-column>
-      <el-table-column prop="name" label="位置编号" width="140" align="center">
+      <el-table-column prop="ID_User_Name" label="姓名" width="140" align="center">
       </el-table-column>
       <el-table-column
         prop="TimeBegin"
@@ -71,48 +71,30 @@
       >
       </el-table-column>
       <el-table-column
-        prop="ID_Location__name"
-        label="地点id"
-        width="140"
-        align="center"
-      >
-      </el-table-column>
-      <el-table-column width="400px" fixed="right" label="操作" align="center">
-        <template slot-scope="scope">
-          <el-button
-            type="success"
-            icon="el-icon-more"
-            size="mini"
-            circle
-            @click="viewqiandao(scope.row)"
-          ></el-button>
-          <el-button
-            type="primary"
-            icon="el-icon-edit"
-            size="mini"
-            circle
-            @click="updateqiandao(scope.row)"
-          ></el-button>
-          <el-button
-            type="danger"
-            icon="el-icon-delete"
-            size="mini"
-            circle
-            @click="deleteqiandao(scope.row)"
-          ></el-button>
-        </template>
-      </el-table-column>
+      prop="Tag"
+      label="标签"
+      align="center"
+      width="100"
+      :filters="[{ text: '已签', value: '已签' }, { text: '迟签', value: '迟签' },{ text: '未签', value: '未签' }]"
+      :filter-method="filterTag"
+      filter-placement="bottom-end">
+      <template slot-scope="scope">
+        <el-tag
+        v-if="scope.row.Tag == '未签'"
+        type="danger"
+        disable-transitions>{{scope.row.Tag}}</el-tag>
+        <el-tag
+        v-if="scope.row.Tag == '迟签'"
+        type="wanrning"
+        disable-transitions>{{scope.row.Tag}}</el-tag>
+        <el-tag
+        v-if="scope.row.Tag == '已签'"
+        type="success"
+        disable-transitions>{{scope.row.Tag}}</el-tag>
+      </template>
+    </el-table-column>
     </el-table>
     <el-row style="margin-top: 10px;">
-      <el-col :span="8" style="text-align: left;margin-left:20px">
-        <el-button
-          type="primary"
-          icon="el-icon-delete"
-          size="mini"
-          @click="deleteqiandaos()"
-          >批量删除</el-button
-        >
-      </el-col>
       <el-col :span="16" style="text-align: right">
         <el-pagination
           @size-change="handleSizeChange"
@@ -144,11 +126,11 @@
       >
         <el-form-item
           label="类型"
-          prop="Type_field"
+          prop="Type"
           v-if="adddialog || viewdialog || updatedialog || deletedialog"
         >
           <el-input
-            v-model="qiandaoform.Type_field"
+            v-model="qiandaoform.Type"
             :disabled="isEdit || isView"
             suffix-icon="el-icon-edit"
           ></el-input>
@@ -266,6 +248,17 @@
           ></el-input>
         </el-form-item>
         <el-form-item
+          label="标签"
+          prop="Tag"
+          v-if="adddialog || viewdialog || updatedialog || deletedialog"
+        >
+          <el-input
+            v-model="qiandaoform.Tag"
+            :disabled="isView"
+            suffix-icon="el-icon-edit"
+          ></el-input>
+        </el-form-item>
+        <el-form-item
           label="打卡者学号"
           prop="ID_User_NoUser"
           v-if="adddialog || viewdialog || updatedialog || deletedialog"
@@ -298,6 +291,7 @@
 <script>
 import axios from "axios";
 import { errcatch } from "../../errcatch";
+import {formatDate3,formatDate1} from '../../timeset'
 export default {
   data() {
     // 校验设备id是否存在
@@ -341,7 +335,6 @@ export default {
       pagesize: 10, //每行显示多少页
       dialogVisible: false,
       qiandaoform: {
-        Type_field: "",
         ID: "",
         Rem: "",
         Introduction: "",
@@ -349,63 +342,16 @@ export default {
         IdManager: "",
         ID_User: "",
         Time: "",
+        Type:"",
         Money: "",
         Param1: "",
         Param2: "",
-        ID_User_NoUser: ""
+        ID_User_NoUser: "",
+        Tag:"",
       },
-      rules: {
-        Type_field: [
-          { required: true, message: "类型不能为空", trigger: "blur" },
-          { validator: rulesID, trigger: "blur" }
-        ],
-        ID: [
-          { required: true, message: "数据库ID不能为空", trigger: "blur" },
-          { validator: rulesID, trigger: "blur" }
-        ],
-        Rem: [{ required: true, message: "备注为空填0", trigger: "blur" }],
-        Introduction: [
-          { required: true, message: "简介为空填0", trigger: "blur" }
-        ],
-        TimeUpdate: [
-          { required: true, message: "修改时间不能为空", trigger: "blur" }
-        ],
-        IdManager: [
-          { required: true, message: "修改者ID不能为空", trigger: "blur" }
-        ],
-        ID_User: [
-          { required: true, message: "用户ID不能为空", trigger: "blur" }
-        ],
-        Time: [
-          { required: true, message: "记录时间不能为空", trigger: "blur" }
-        ],
-        Money: [{ required: true, message: "费用为空填0", trigger: "blur" }],
-        Time: [
-          { required: true, message: "记录时间不能为空", trigger: "blur" }
-        ],
-        Param1: [
-          { required: true, message: "考勤机编号不能为空", trigger: "blur" }
-        ],
-        Param2: [
-          { required: true, message: "安排编号不能为空", trigger: "blur" }
-        ],
-        ID_User_NoUser: [
-          { required: true, message: "打卡者学号不能为空", trigger: "blur" }
-        ]
-      },
+     
       searchform:{
         "requires": {
-          ID: 0,
-          Rem: "string",
-          Introduction: "string",
-          TimeUpdate: 0,
-          IdManager: 0,
-          ID_User: 0,
-          Time: 0,
-          Type: 0,
-          Money: 0,
-          Param1: 0,
-          Param2: 0
         },
         service_type: 0,
         page: 1,
@@ -422,39 +368,6 @@ export default {
       deletedialog: false,
 
       selectqiandaos: [], //选择复选时把选择记录存在这里
-      addqiandaoform: {
-        data: [
-          {
-            Type_field: "",
-            Rem: "",
-            Introduction: "",
-            ID_User: "",
-            Time: "",
-            Money: "",
-            Param1: "",
-            Param2: "",
-            ID_User_NoUser: ""
-          }
-        ],
-        n: 1
-      },
-      updateqiandaoform: {
-        data: [
-          {
-            Type_field: "",
-            ID: "",
-            Rem: "",
-            Introduction: "",
-            ID_User: "",
-            Time: "",
-            Money: "",
-            Param1: "",
-            Param2: "",
-            ID_User_NoUser: ""
-          }
-        ],
-        n: 1
-      }
     };
   },
   mounted() {
@@ -463,6 +376,9 @@ export default {
   },
   methods: {
     //详情生成该位置签到记录表
+    filterTag(value, row) {
+        return row.Tag === value;
+      },
     handleclick(row) {
       //跳转路由
       //         setTimeout(function (){
@@ -471,22 +387,25 @@ export default {
       // })},500);
       this.$router.push({ path: "/qiandao?index=" + row.ID });
     },
+    getqiandao2(){
+      this.searchform.service_type=0;
+      this.getqiandao()
+    },
     //获取所有设备信息
     getqiandao: function() {
       //记录this的地址
       let that = this;
       this.searchform.size=this.pagesize;
       this.searchform.page=this.currentpage;
-      this.searchform.service_type=0;
+      let courseplan_ID=localStorage.getItem('courseplan_ID');
       //使用Axios实现Ajax请求
       axios
-        ({url:"/api/" + "model_runningaccount/search",
+        ({url:"/api/" + "model_runningaccount/result",
         method:'post',
         headers:{
         'accept': "application/json",
         'Authorization':'Bearer'+" "+this.webtoken
-      },
-      data:this.searchform,
+      },params:{course_plan:courseplan_ID,page:this.currentpage,size:this.pagesize}
       })
         .then(function(res) {
           //请求成功后执行的函数
@@ -530,6 +449,20 @@ export default {
         i++
       ) {
         //遍历数据添加到pageshebei中
+        if(this.qiandao[i].Time==0){
+          this.qiandao[i].Tag='未签'
+        }
+        else if(this.qiandao[i].Time<=this.qiandao[i].TimeBegin){
+           this.qiandao[i].Tag='已签'
+        }
+        else if(this.qiandao[i].Time<=this.qiandao[i].TimeEnd){
+          this.qiandao[i].Tag='迟签'
+        }
+        else{
+          this.qiandao[i].Tag='未签'
+        }
+        this.qiandao[i].TimeBegin=formatDate1(this.qiandao[i].TimeBegin)
+        this.qiandao[i].TimeEnd=formatDate1(this.qiandao[i].TimeEnd)
         this.pageqiandao.push(this.qiandao[i]);
       }
     },
@@ -537,8 +470,8 @@ export default {
     queryqiandao() {
       //使用Ajax请求--POST-->传递input_string
       let that = this;
-      this.searchform.service_type=1;
-      this.searchform['requires'].ID=this.input_string*1;
+      this.searchform.service_type=3;
+      this.searchform['requires'].Name=this.input_string*1;
       //开始Ajax请求
      axios //Axios请求
         ({url:"/api/" + "model_runningaccount/search",
@@ -550,27 +483,34 @@ export default {
       data:this.searchform,
       })
         .then(function(res) {
-          if (true) {
-            //把数据给shebei
-            //that.qiandao = res.data.data;
-            //获取返回记录的总行数
-            //that.total = res.data.data.length;
-            //获取当前页的数据
-            //that.getpageqiandao();
-            that.getqiandao();
-            //数据加载成功提示
-            that.$message({
-              message: "筛选数据加载成功！",
-              type: "success"
-            });
+          //请求成功后执行的函数
+          //console.log(res);
+          if (res.data.code == 0) {
+            that.$router.push("/index");
           } else {
-            //数据加载失败提示
-            that.$message.error(res.data.msg);
+            if (true) {
+              //res.data.code ===1
+              //把数据给位置
+              that.qiandao = res.data.items;
+              //获取返回记录的总行数
+              that.total = res.data.total;
+              //获取当前页的数据
+              that.getpageqiandao();
+              //数据加载成功提示
+              that.$message({
+                message: "数据加载成功！",
+                type: "success"
+              });
+            } else {
+              //数据加载失败提示
+              that.$message.error("获取数据出现异常");
+            }
           }
         })
-        .catch(function(err) {
+        .catch(function(res) {
+          //请求失败后执行的函数
           errcatch(err);
-          that.$message.error("获取后端数据出现异常!");
+          that.$message.error("获取后端数据出现异常");
         });
     },
     //分页时修改每页的行数
@@ -591,15 +531,6 @@ export default {
     handleSelectionChange(data) {
       this.selectqiandaos = data;
     },
-    //添加位置时打开表单
-    addqiandao() {
-      //修改标题
-      this.dialogTitle = "添加位置明细";
-      this.adddialog = true;
-      //弹出表单
-      this.dialogVisible = true;
-    },
-    //关闭弹出框的表单
     closeDialogForm(formName) {
       //清空数据
       this.qiandaoform.Type_field = "";
@@ -614,7 +545,7 @@ export default {
       this.qiandaoform.Param1 = "";
       this.qiandaoform.Param2 = "";
       this.qiandaoform.ID_User_NoUser = "";
-      (this.addqiandaoform.data[0].Type_field = ""),
+      (this.addqiandaoform.data[0].Type = ""),
         (this.addqiandaoform.data[0].Rem = ""),
         (this.addqiandaoform.data[0].Introduction = ""),
         (this.addqiandaoform.data[0].ID_User = ""),
@@ -623,7 +554,7 @@ export default {
         (this.addqiandaoform.data[0].Param1 = ""),
         (this.addqiandaoform.data[0].Param2 = ""),
         (this.addqiandaoform.data[0].ID_User_NoUser = ""),
-        (this.updateqiandaoform.data[0].Type_field = ""),
+        (this.updateqiandaoform.data[0].Type = ""),
         (this.updateqiandaoform.data[0].ID = ""),
         (this.updateqiandaoform.data[0].Rem = ""),
         (this.updateqiandaoform.data[0].Introduction = ""),
@@ -651,261 +582,6 @@ export default {
       this.updatedialog = false;
       this.deletedialog = false;
     },
-
-    //查看位置的明细
-    viewqiandao(row) {
-      //修改标题
-      this.dialogTitle = "查看位置明细";
-      //修改isView变量
-      this.isView = true;
-      this.viewdialog = true;
-      //弹出表单
-      this.dialogVisible = true;
-      //进行深拷贝
-      this.qiandaoform = JSON.parse(JSON.stringify(row));
-    },
-    //修改设备的信息
-    updateqiandao(row) {
-      //修改标题
-      this.dialogTitle = "修改位置明细";
-      //修改isEdit变量
-      this.isEdit = true;
-      this.updatedialog = true;
-      //弹出表单
-      this.dialogVisible = true;
-      this.qiandaoform = JSON.parse(JSON.stringify(row));
-    },
-    //提交设备的表单（添加、修改）
-    submitqiandaoform(formName) {
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          //校验成功后执行添加或者修改
-          if (this.isEdit) {
-            this.shebeiform.ID = Number(this.shebeiform.ID);
-            this.submitupdataqiandao();
-          } else {
-            //添加
-            this.shebeiform.ID = Number(this.shebeiform.ID);
-            this.submitaddqiandao();
-          }
-          alert("submit!");
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
-    },
-    //添加到数据库的函数
-    submitaddqiandao() {
-      this.addqiandaoform.data[0].Type_field = this.qiandaoform.Type_field;
-      this.addqiandaoform.data[0].Rem = this.qiandaoform.Rem;
-      this.addqiandaoform.data[0].Introduction = this.qiandaoform.Introduction;
-      this.addqiandaoform.data[0].ID_User = this.qiandaoform.ID_User;
-      this.addqiandaoform.data[0].Time = this.qiandaoform.Time;
-      this.addqiandaoform.data[0].Money = this.qiandaoform.Money;
-      this.addqiandaoform.data[0].Param1 = this.qiandaoform.Param1;
-      this.addqiandaoform.data[0].Param2 = this.qiandaoform.Param2;
-      this.addqiandaoform.data[0].ID_User_NoUser = this.qiandaoform.ID_User_NoUser;
-      let that = this;
-      //执行Axios请求
-     axios({url:"/api/" + "model_runningaccount/",
-        method:'post',
-        headers:{
-        'accept': "application/json",
-        'Authorization':'Bearer'+" "+this.webtoken
-      },
-      data:this.addqiandaoform,
-      })
-        .then(res => {
-          //执行成功
-          if (true) {
-            //res.data.code == 1
-            // //获取所有位置信息
-            // that.qiandao = res.data.data;
-            // //获取记录条数
-            // that.total = res.data.data.length;
-            // //获取分页信息
-            // that.getpageqiandao();
-            that.getqiandao();
-            //提示
-            that.$message({
-              message: "数据加载成功！",
-              type: "success"
-            });
-            //关闭窗体
-            that.closeDialogForm("qiandaoform");
-          } else {
-            //失败提示
-            that.$message.error(res.data.error_message);
-          }
-        })
-        .catch(err => {
-          //执行失败
-          console.log(err);
-          that.$message.error("获取后端结果出现异常");
-        });
-    },
-    //修改更新到数据库
-    submitupdataqiandao() {
-      this.updataqiandaoform.data[0].Type_field = this.qiandaoform.Type_field;
-      this.updataqiandaoform.data[0].ID = this.qiandaoform.ID;
-      this.updataqiandaoform.data[0].Rem = this.qiandaoform.Rem;
-      this.updataqiandaoform.data[0].Introduction = this.qiandaoform.Introduction;
-      this.updataqiandaoform.data[0].ID_User = this.qiandaoform.ID_User;
-      this.updataqiandaoform.data[0].Time = this.qiandaoform.Time;
-      this.updataqiandaoform.data[0].Money = this.qiandaoform.Money;
-      this.updataqiandaoform.data[0].Param1 = this.qiandaoform.Param1;
-      this.updataqiandaoform.data[0].Param2 = this.qiandaoform.Param2;
-      this.updataqiandaoform.data[0].ID_User_NoUser = this.qiandaoform.ID_User_NoUser;
-      let that = this;
-      //执行Axios请求
-      axios
-        ({url:"/api/" + "model_runningaccount/", 
-        method:'put',
-        headers:{
-        'accept': "application/json",
-        'Authorization':'Bearer'+" "+this.webtoken
-      },
-        data:that.updateqiandaoform}).then(res => {
-          //执行成功
-          if (true) {
-            //res.data.code == 1
-            // //获取所有位置信息
-            // that.qiandao = res.data.data;
-            // //获取记录条数
-            // that.total = res.data.data.length;
-            // //获取分页信息
-            // that.getpageqiandao();
-            that.getqiandao();
-            //提示
-            that.$message({
-              message: "数据修改成功！",
-              type: "success"
-            });
-            //关闭窗体
-            that.closeDialogForm("qiandaoform");
-          } else {
-            //失败提示
-            that.$message.error(res.data.error_message);
-          }
-        })
-        .catch(err => {
-          //执行失败
-          console.log(err);
-          that.$message.error("获取后端结果出现异常！");
-        });
-    },
-    //删除一条位置信息
-    deleteqiandao(row) {
-      //等待确认
-      this.$confirm(
-        "是否确认删除签到信息【ID：" +
-          row.ID +
-          "】信息？",
-        "提示",
-        {
-          confirmButtonText: "确定删除",
-          cancelButtonText: "取消",
-          type: "warning"
-        }
-      )
-        .then(() => {
-          //确认删除响应事件
-          let that = this;
-          //调用后端接口
-          axios
-            ({url:"/api/" + "model_runningaccount/", 
-        method:'delete',
-        headers:{
-        'accept': "application/json",
-        'Authorization':'Bearer'+" "+this.webtoken
-      },
-        data:{ "data": [{ 'ID': row.ID }],'n':1 }
-        })
-            .then(res => {
-              if (true) {
-                // //获取所有位置信息
-                // that.qiandao = res.data.data;
-                // //获取记录数
-                // that.total = res.data.data.length;
-                // //分页
-                // that.getpageqiandao();
-                that.getqiandao();
-                //提示
-                that.$message({
-                  message: "数据删除成功！",
-                  type: "success"
-                });
-              } else {
-                that.$message.error("数据删除失败！");
-              }
-            });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-        });
-    },
-    //批量删除位置信息
-    deleteqiandaos() {
-      //等待确认
-      this.$confirm(
-        "是否确认批量删除" + this.selectqiandaos.length + "个位置信息吗？",
-        "提示",
-        {
-          confirmButtonText: "确定删除",
-          cancelButtonText: "取消",
-          type: "warning"
-        }
-      )
-        .then(() => {
-          let data = [];
-          for (var i = 0; i < this.selectqiandaos.length; i++) {
-            data.push({ ID: this.selectqiandaos[i].ID * 1 });
-          }
-          //确认删除响应事件
-          let that = this;
-          //调用后端接口
-           axios
-             ({url:"/api/" + "model_runningaccount/", 
-        method:'delete',
-        headers:{
-        'accept': "application/json",
-        'Authorization':'Bearer'+" "+this.webtoken
-      },
-        data:{
-              data,
-              n: this.selectqiandaos.length
-            }
-        })
-            .then(res => {
-              if (true) {
-                // //获取所有位置信息
-                // that.qiandao = res.data.data;
-                // //获取记录数
-                // that.total = res.data.data.length;
-                // //分页
-                // that.getpageqiandao();
-                that.getqiandao();
-                //提示
-                that.$message({
-                  message: "数据批量删除成功！",
-                  type: "success"
-                });
-              } else {
-                that.$message.error("数据批量删除失败！");
-              }
-            });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-        });
-    }
   }
 };
 </script>

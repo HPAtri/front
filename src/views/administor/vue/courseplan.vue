@@ -3,10 +3,10 @@
     <el-form v-model="courseplanform" :inline="true" style="margin-top:20px;">
       <el-row style="margin-left:20px;">
         <el-col :span="12">
-          <el-form-item label="请输入筛选条件：">
+          <el-form-item label="请输入筛选条件">
             <el-input
               v-model="input_string"
-              placeholder="输入筛选条件"
+              placeholder="输入课程ID:"
               style="width: 420px;"
             >
             </el-input>
@@ -55,7 +55,7 @@
       </el-table-column>
       <el-table-column prop="ID" label="课程ID" width="120" align="center">
       </el-table-column>
-      <el-table-column prop="ID_Curricula" label="ID序列" width="140" align="center">
+      <el-table-column prop="ID_Curricula" label="对应课程ID" width="140" align="center">
       </el-table-column>
       <el-table-column
         prop="TimeBegin"
@@ -199,7 +199,7 @@
           ></el-input>
         </el-form-item>
         <el-form-item
-          label="ID序列"
+          label="对应课程ID"
           prop="ID_Curricula"
           v-if="adddialog || viewdialog || updatedialog || deletedialog"
         >
@@ -863,6 +863,7 @@ export default {
       //使用Ajax请求--POST-->传递input_string
       let that = this;
       this.searchform.service_type=3;
+      delete this.searchform['requires'].ID_Curricula
       this.searchform['requires'].ID=this.input_string*1;
       //开始Ajax请求
       axios //Axios请求
@@ -875,25 +876,31 @@ export default {
       data:this.searchform,
       })
         .then(function(res) {
-          if (true) {
-            //把数据给shebei
-            //that.courseplan = res.data.data;
-            //获取返回记录的总行数
-            //that.total = res.data.data.length;
-            //获取当前页的数据
-            //that.getpagecourseplan();
-            that.getcourseplan();
-            //数据加载成功提示
-            that.$message({
-              message: "筛选数据加载成功！",
-              type: "success"
-            });
+          //请求成功后执行的函数
+          //console.log(res);
+          if (res.data.code == 0) {
+            that.$router.push("/index");
           } else {
-            //数据加载失败提示
-            that.$message.error(res.data.msg);
+            if (true) {
+              //res.data.code ===1
+              //把数据给课程
+              that.courseplan = res.data.items;
+              //获取返回记录的总行数
+              that.total = res.data.total;
+              //获取当前页的数据
+              that.getpagecourseplan();
+              //数据加载成功提示
+              that.$message({
+                message: "数据加载成功！",
+                type: "success"
+              });
+            } else {
+              //数据加载失败提示
+            }
           }
         })
-        .catch(function(err) {
+        .catch(err=> {
+          //请求失败后执行的函数
           errcatch(err);
         });
     },

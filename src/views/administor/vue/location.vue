@@ -6,7 +6,7 @@
           <el-form-item label="请输入筛选条件：">
             <el-input
               v-model="input_string"
-              placeholder="输入筛选条件"
+              placeholder="输入位置ID"
               style="width: 420px;"
             >
             </el-input>
@@ -23,7 +23,7 @@
             <el-button
               type="primary"
               icon="el-icon-tickets"
-              @click="getlocation()"
+              @click="getlocation2()"
               >全部</el-button
             >
             <el-button
@@ -355,13 +355,6 @@ export default {
       },
       searchform:{
       requires: {
-        ID: 0,
-        Rem: "",
-        Introduction: "",
-        TimeUpdate: 0,
-        IdManager: 0,
-        ID_Parent: 0,
-        Name: "",
       },
       service_type: 0,
       page: 1,
@@ -426,12 +419,15 @@ export default {
       this.$router.push({ path: "/qiandao?index=" + row.ID });
     },
     //获取所有设备信息
+    getlocation2(){
+      this.searchform.service_type=0,
+      this.getlocation()
+    },
     getlocation: function() {
       //记录this的地址
       let that = this;
       this.searchform.size=this.pagesize;
       this.searchform.page=this.currentpage;
-      this.searchform.service_type=0;
       //使用Axios实现Ajax请求
       axios
         axios

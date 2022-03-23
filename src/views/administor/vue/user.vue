@@ -6,7 +6,7 @@
           <el-form-item label="请输入筛选条件：">
             <el-input
               v-model="input_string"
-              placeholder="输入筛选条件"
+              placeholder="输入用户ID"
               style="width: 420px;"
             >
             </el-input>
@@ -17,7 +17,7 @@
             <el-button type="primary" icon="el-icon-search" @click="queryuser()"
               >筛选</el-button
             >
-            <el-button type="primary" icon="el-icon-tickets" @click="getuser()"
+            <el-button type="primary" icon="el-icon-tickets" @click="getuser2()"
               >全部</el-button
             >
             <el-button
@@ -489,27 +489,7 @@ export default {
       },
       searchform:{
   "requires": {
-          ID: 0,
-          Rem: "string",
-          Introduction: "string",
-          TimeUpdate: 0,
-          IdManager: 0,
-          Deptid: 0,
-          NoCard: "string",
-          NoUser: "string",
-          NoSfz: 0,
-          Name: "string",
-          Psw: "string",
-          Sex: 0,
-          Attr: 0,
-          AttrJf: 0,
-          Power: 0,
-          PowerJf: 0,
-          Email: "string",
-          Phone: 0,
-          Yue: 0,
-          Yue2: 0,
-          LocalID: "string"
+          
         },
         service_type: 0,
         page: 1,
@@ -635,13 +615,16 @@ adduserform:{
         this.userform.Sex = 1;
       }
     },
+    getuser2(){
+      this.searchform.service_type=0,
+      this.getuser()
+    },
     //获取所有设备信息
     getuser: function() {
       //记录this的地址
       let that = this;
       this.searchform.size=this.pagesize;
       this.searchform.page=this.currentpage;
-      this.searchform.service_type=0;
       //使用Axios实现Ajax请求
       axios
         ({url:"/api/" + "model_user/search",

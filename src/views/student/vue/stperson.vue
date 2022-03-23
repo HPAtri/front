@@ -483,19 +483,19 @@ export default {
       return isJPG;
     },
     // 提交图片
-    imageChange(param, type, file) {
+    imageChange(param,file) {
       let formData = new FormData();
-      formData.append("Rem", that.userform.Rem);
-      formData.append("Introduction", that.userform.Introduction);
-      formData.append("NoUser", that.userform.NoUser);
-      formData.append("NoSfz", that.userform.NoSfz);
-      //   formData.append("FaceFearture", that.userform.FaceFearture);
-      //   formData.append("Photo",that.userform.Photo,);
-      formData.append("Photo_dataF", param.file);
-
-      this.$http
-        .post("http://localhost:85/polls/Picture/", formData)
-        .then(res => {
+      formData.append('ID',this.userform.ID),
+      formData.append('NoUser',this.userform.NoUser),
+      formData.append('file',param.file),
+      axios({url:"/api/" + "model_userextension/"+'?ID='+this.userform.ID+'&NoUser='+this.userform.NoUser,
+        method:'post',
+        headers:{
+        'accept': "application/json",
+        'Content-Type': 'multipart/form-data',
+        'Authorization':'Bearer'+" "+this.webtoken
+      },data:formData
+      }).then(res => {
           this.$message.success("上传成功");
         })
         .catch(err => {
@@ -570,34 +570,6 @@ export default {
           console.log("保存失败！");
         });
     }
-  },
-  submitpic() {
-    let that = this;
-    this.timeup();
-    axios
-      .patch("/api/" + "PersonInformation/", {
-        Rem: that.userform.Rem,
-        Introduction: that.userform.Introduction,
-        NoUser: that.userform.NoUser,
-        NoSfz: that.userform.NoSfz,
-        FaceFearture: that.userform.FaceFearture,
-        Photo: that.userform.Photo,
-        Photo_dataF: that.userform.Photo_dataF
-      })
-      .then(res => {
-        //执行成功
-        if (true) {
-          //res.data.code == 1
-          that.getuser();
-        } else {
-          //数据加载失败提示
-          that.$message.error(res.data.msg);
-        }
-      })
-      .catch(function(err) {
-        //请求失败后执行的函数
-        console.log("保存失败！");
-      });
   }
 };
 </script>

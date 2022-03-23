@@ -12,9 +12,9 @@
                     <i class="el-icon-document"></i>
                     <span slot="title"> 学生课程管理</span>
                 </el-menu-item>
-                <el-menu-item index="2" :route="{name:'课程签到详情'}">
+                <el-menu-item index="2" :route="{name:'学生签到详情'}">
                     <i class="el-icon-document"></i>
-                    <span slot="title"> 课程签到详情</span>
+                    <span slot="title"> 学生签到详情</span>
                 </el-menu-item>
                 <el-menu-item index="3" :route="{name:'学生个人中心'}">
                     <i class="el-icon-document-checked"></i>

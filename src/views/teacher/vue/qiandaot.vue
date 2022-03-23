@@ -3,18 +3,18 @@
     <el-form v-model="qiandaoform" :inline="true" style="margin-top:20px;">
       <el-row style="margin-left:20px;">
         <el-col :span="12">
-          <el-form-item label="请输入筛选条件：">
+          <!-- <el-form-item label="请输入筛选条件：">
             <el-input
               v-model="input_string"
-              placeholder="输入筛选条件"
+              placeholder="请输入查询ID"
               style="width: 420px;"
             >
-            </el-input>
-          </el-form-item>
+            </el-input> -->
+          <!-- </el-form-item> -->
         </el-col>
         <el-col :span="8" style="text-align: right;padding-right:10px;">
           <el-button-group>
-            <el-button
+            <!-- <el-button
               type="primary"
               icon="el-icon-search"
               @click="queryqiandao()"
@@ -23,7 +23,7 @@
             <el-button
               type="primary"
               icon="el-icon-tickets"
-              @click="getqiandao()"
+              @click="getqiandao2()"
               >全部</el-button
             >
             <el-button
@@ -31,7 +31,7 @@
               icon="el-icon-circle-plus-outline"
               @click="addqiandao()"
               >添加</el-button
-            >
+            > -->
           </el-button-group>
         </el-col>
       </el-row>
@@ -52,9 +52,9 @@
         fixed="left"
       >
       </el-table-column>
-      <el-table-column prop="ID" label="位置ID" width="120" align="center">
+      <el-table-column prop="ID_User" label="ID" width="115" align="center">
       </el-table-column>
-      <el-table-column prop="name" label="位置编号" width="140" align="center">
+      <el-table-column prop="ID_User_Name" label="姓名" width="140" align="center">
       </el-table-column>
       <el-table-column
         prop="TimeBegin"
@@ -71,28 +71,45 @@
       >
       </el-table-column>
       <el-table-column
-        prop="ID_Location__name"
-        label="地点id"
-        width="140"
-        align="center"
-      >
-      </el-table-column>
+      prop="Tag"
+      label="标签"
+      align="center"
+      width="100"
+      :filters="[{ text: '已签', value: '已签' }, { text: '迟签', value: '迟签' },{ text: '未签', value: '未签' }]"
+      :filter-method="filterTag"
+      filter-placement="bottom-end">
+      <template slot-scope="scope">
+        <el-tag
+        v-if="scope.row.Tag == '未签'"
+        type="danger"
+        disable-transitions>{{scope.row.Tag}}</el-tag>
+        <el-tag
+        v-if="scope.row.Tag == '迟签'"
+        type="wanrning"
+        disable-transitions>{{scope.row.Tag}}</el-tag>
+        <el-tag
+        v-if="scope.row.Tag == '已签'"
+        type="success"
+        disable-transitions>{{scope.row.Tag}}</el-tag>
+      </template>
+    </el-table-column>
       <el-table-column width="400px" fixed="right" label="操作" align="center">
         <template slot-scope="scope">
           <el-button
             type="success"
-            icon="el-icon-more"
             size="mini"
-            circle
-            @click="viewqiandao(scope.row)"
-          ></el-button>
+            @click="setsuccess(scope.row)"
+          >已签</el-button>
           <el-button
-            type="primary"
-            icon="el-icon-edit"
+            type="warning"
             size="mini"
-            circle
-            @click="updateqiandao(scope.row)"
-          ></el-button>
+            @click="setwarning(scope.row)"
+          >迟签</el-button>
+          <el-button
+            type="danger"
+            size="mini"
+            @click="setdanger(scope.row)"
+          >未签</el-button>
           <el-button
             type="danger"
             icon="el-icon-delete"
@@ -144,11 +161,11 @@
       >
         <el-form-item
           label="类型"
-          prop="Type_field"
+          prop="Type"
           v-if="adddialog || viewdialog || updatedialog || deletedialog"
         >
           <el-input
-            v-model="qiandaoform.Type_field"
+            v-model="qiandaoform.Type"
             :disabled="isEdit || isView"
             suffix-icon="el-icon-edit"
           ></el-input>
@@ -266,6 +283,17 @@
           ></el-input>
         </el-form-item>
         <el-form-item
+          label="标签"
+          prop="Tag"
+          v-if="adddialog || viewdialog || updatedialog || deletedialog"
+        >
+          <el-input
+            v-model="qiandaoform.Tag"
+            :disabled="isView"
+            suffix-icon="el-icon-edit"
+          ></el-input>
+        </el-form-item>
+        <el-form-item
           label="打卡者学号"
           prop="ID_User_NoUser"
           v-if="adddialog || viewdialog || updatedialog || deletedialog"
@@ -298,6 +326,7 @@
 <script>
 import axios from "axios";
 import { errcatch } from "../../errcatch";
+import {formatDate3,formatDate1} from '../../timeset'
 export default {
   data() {
     // 校验设备id是否存在
@@ -341,7 +370,6 @@ export default {
       pagesize: 10, //每行显示多少页
       dialogVisible: false,
       qiandaoform: {
-        Type_field: "",
         ID: "",
         Rem: "",
         Introduction: "",
@@ -349,10 +377,12 @@ export default {
         IdManager: "",
         ID_User: "",
         Time: "",
+        Type:"",
         Money: "",
         Param1: "",
         Param2: "",
-        ID_User_NoUser: ""
+        ID_User_NoUser: "",
+        Tag:"",
       },
       rules: {
         Type_field: [
@@ -395,17 +425,6 @@ export default {
       },
       searchform:{
         "requires": {
-          ID: 0,
-          Rem: "string",
-          Introduction: "string",
-          TimeUpdate: 0,
-          IdManager: 0,
-          ID_User: 0,
-          Time: 0,
-          Type: 0,
-          Money: 0,
-          Param1: 0,
-          Param2: 0
         },
         service_type: 0,
         page: 1,
@@ -425,11 +444,11 @@ export default {
       addqiandaoform: {
         data: [
           {
-            Type_field: "",
             Rem: "",
             Introduction: "",
             ID_User: "",
             Time: "",
+            Type:"",
             Money: "",
             Param1: "",
             Param2: "",
@@ -441,12 +460,12 @@ export default {
       updateqiandaoform: {
         data: [
           {
-            Type_field: "",
             ID: "",
             Rem: "",
             Introduction: "",
             ID_User: "",
             Time: "",
+            Type:"",
             Money: "",
             Param1: "",
             Param2: "",
@@ -463,6 +482,9 @@ export default {
   },
   methods: {
     //详情生成该位置签到记录表
+    filterTag(value, row) {
+        return row.Tag === value;
+      },
     handleclick(row) {
       //跳转路由
       //         setTimeout(function (){
@@ -471,22 +493,25 @@ export default {
       // })},500);
       this.$router.push({ path: "/qiandao?index=" + row.ID });
     },
+    getqiandao2(){
+      this.searchform.service_type=0;
+      this.getqiandao()
+    },
     //获取所有设备信息
     getqiandao: function() {
       //记录this的地址
       let that = this;
       this.searchform.size=this.pagesize;
       this.searchform.page=this.currentpage;
-      this.searchform.service_type=0;
+      let courseplan_ID=localStorage.getItem('courseplan_ID');
       //使用Axios实现Ajax请求
       axios
-        ({url:"/api/" + "model_runningaccount/search",
+        ({url:"/api/" + "model_runningaccount/result",
         method:'post',
         headers:{
         'accept': "application/json",
         'Authorization':'Bearer'+" "+this.webtoken
-      },
-      data:this.searchform,
+      },params:{course_plan:courseplan_ID,page:this.currentpage,size:this.pagesize}
       })
         .then(function(res) {
           //请求成功后执行的函数
@@ -530,6 +555,20 @@ export default {
         i++
       ) {
         //遍历数据添加到pageshebei中
+        if(this.qiandao[i].Time==0){
+          this.qiandao[i].Tag='未签'
+        }
+        else if(this.qiandao[i].Time<=this.qiandao[i].TimeBegin){
+           this.qiandao[i].Tag='已签'
+        }
+        else if(this.qiandao[i].Time<=this.qiandao[i].TimeEnd){
+          this.qiandao[i].Tag='迟签'
+        }
+        else{
+          this.qiandao[i].Tag='未签'
+        }
+        this.qiandao[i].TimeBegin=formatDate1(this.qiandao[i].TimeBegin)
+        this.qiandao[i].TimeEnd=formatDate1(this.qiandao[i].TimeEnd)
         this.pageqiandao.push(this.qiandao[i]);
       }
     },
@@ -537,8 +576,8 @@ export default {
     queryqiandao() {
       //使用Ajax请求--POST-->传递input_string
       let that = this;
-      this.searchform.service_type=1;
-      this.searchform['requires'].ID=this.input_string*1;
+      this.searchform.service_type=3;
+      this.searchform['requires'].Name=this.input_string*1;
       //开始Ajax请求
      axios //Axios请求
         ({url:"/api/" + "model_runningaccount/search",
@@ -550,27 +589,34 @@ export default {
       data:this.searchform,
       })
         .then(function(res) {
-          if (true) {
-            //把数据给shebei
-            //that.qiandao = res.data.data;
-            //获取返回记录的总行数
-            //that.total = res.data.data.length;
-            //获取当前页的数据
-            //that.getpageqiandao();
-            that.getqiandao();
-            //数据加载成功提示
-            that.$message({
-              message: "筛选数据加载成功！",
-              type: "success"
-            });
+          //请求成功后执行的函数
+          //console.log(res);
+          if (res.data.code == 0) {
+            that.$router.push("/index");
           } else {
-            //数据加载失败提示
-            that.$message.error(res.data.msg);
+            if (true) {
+              //res.data.code ===1
+              //把数据给位置
+              that.qiandao = res.data.items;
+              //获取返回记录的总行数
+              that.total = res.data.total;
+              //获取当前页的数据
+              that.getpageqiandao();
+              //数据加载成功提示
+              that.$message({
+                message: "数据加载成功！",
+                type: "success"
+              });
+            } else {
+              //数据加载失败提示
+              that.$message.error("获取数据出现异常");
+            }
           }
         })
-        .catch(function(err) {
+        .catch(function(res) {
+          //请求失败后执行的函数
           errcatch(err);
-          that.$message.error("获取后端数据出现异常!");
+          that.$message.error("获取后端数据出现异常");
         });
     },
     //分页时修改每页的行数
@@ -590,6 +636,36 @@ export default {
     //选择复选框触发操作
     handleSelectionChange(data) {
       this.selectqiandaos = data;
+    },
+    setsuccess(row){
+      row.Tag='已签';
+      row.Time=formatDate3(row.TimeBegin)-1;
+      this.qiandaoform = JSON.parse(JSON.stringify(row));
+      if(row.ID===null){
+      this.submitaddqiandao(row)
+      }else{
+      this.submitupdateqiandao(row)
+      }
+    },
+    setwarning(row){
+      row.Tag='迟签';
+      row.Time=formatDate3(row.TimeEnd)-1;
+      this.qiandaoform = JSON.parse(JSON.stringify(row));
+      if(JSON.stringify(row.ID)==={}){
+      this.submitaddqiandao(row)
+      }else{
+      this.submitupdateqiandao(row)
+      }
+    },
+    setdanger(row){
+      row.Tag='未签';
+      row.Time=formatDate3(row.TimeEnd)+1;
+      this.qiandaoform = JSON.parse(JSON.stringify(row));
+      if(JSON.stringify(row.ID)==={}){
+      this.submitaddqiandao(row)
+      }else{
+      this.submitupdateqiandao(row)
+      }
     },
     //添加位置时打开表单
     addqiandao() {
@@ -614,7 +690,7 @@ export default {
       this.qiandaoform.Param1 = "";
       this.qiandaoform.Param2 = "";
       this.qiandaoform.ID_User_NoUser = "";
-      (this.addqiandaoform.data[0].Type_field = ""),
+      (this.addqiandaoform.data[0].Type = ""),
         (this.addqiandaoform.data[0].Rem = ""),
         (this.addqiandaoform.data[0].Introduction = ""),
         (this.addqiandaoform.data[0].ID_User = ""),
@@ -623,7 +699,7 @@ export default {
         (this.addqiandaoform.data[0].Param1 = ""),
         (this.addqiandaoform.data[0].Param2 = ""),
         (this.addqiandaoform.data[0].ID_User_NoUser = ""),
-        (this.updateqiandaoform.data[0].Type_field = ""),
+        (this.updateqiandaoform.data[0].Type = ""),
         (this.updateqiandaoform.data[0].ID = ""),
         (this.updateqiandaoform.data[0].Rem = ""),
         (this.updateqiandaoform.data[0].Introduction = ""),
@@ -651,38 +727,11 @@ export default {
       this.updatedialog = false;
       this.deletedialog = false;
     },
-
-    //查看位置的明细
-    viewqiandao(row) {
-      //修改标题
-      this.dialogTitle = "查看位置明细";
-      //修改isView变量
-      this.isView = true;
-      this.viewdialog = true;
-      //弹出表单
-      this.dialogVisible = true;
-      //进行深拷贝
-      this.qiandaoform = JSON.parse(JSON.stringify(row));
-    },
-    //修改设备的信息
-    updateqiandao(row) {
-      //修改标题
-      this.dialogTitle = "修改位置明细";
-      //修改isEdit变量
-      this.isEdit = true;
-      this.updatedialog = true;
-      //弹出表单
-      this.dialogVisible = true;
-      this.qiandaoform = JSON.parse(JSON.stringify(row));
-    },
-    //提交设备的表单（添加、修改）
     submitqiandaoform(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
           //校验成功后执行添加或者修改
           if (this.isEdit) {
-            this.shebeiform.ID = Number(this.shebeiform.ID);
-            this.submitupdataqiandao();
           } else {
             //添加
             this.shebeiform.ID = Number(this.shebeiform.ID);
@@ -696,16 +745,16 @@ export default {
       });
     },
     //添加到数据库的函数
-    submitaddqiandao() {
-      this.addqiandaoform.data[0].Type_field = this.qiandaoform.Type_field;
-      this.addqiandaoform.data[0].Rem = this.qiandaoform.Rem;
-      this.addqiandaoform.data[0].Introduction = this.qiandaoform.Introduction;
-      this.addqiandaoform.data[0].ID_User = this.qiandaoform.ID_User;
-      this.addqiandaoform.data[0].Time = this.qiandaoform.Time;
-      this.addqiandaoform.data[0].Money = this.qiandaoform.Money;
-      this.addqiandaoform.data[0].Param1 = this.qiandaoform.Param1;
-      this.addqiandaoform.data[0].Param2 = this.qiandaoform.Param2;
-      this.addqiandaoform.data[0].ID_User_NoUser = this.qiandaoform.ID_User_NoUser;
+    submitaddqiandao(row) {
+      this.addqiandaoform.data[0].Type = row.Type;
+      this.addqiandaoform.data[0].Rem = row.Rem;
+      this.addqiandaoform.data[0].Introduction = row.Introduction;
+      this.addqiandaoform.data[0].ID_User = row.ID_User;
+      this.addqiandaoform.data[0].Time = row.Time;
+      this.addqiandaoform.data[0].Money = row.Money;
+      this.addqiandaoform.data[0].Param1 = row.Param1;
+      this.addqiandaoform.data[0].Param2 = row.Param2;
+      this.addqiandaoform.data[0].ID_User_NoUser = row.ID_User_NoUser;
       let that = this;
       //执行Axios请求
      axios({url:"/api/" + "model_runningaccount/",
@@ -746,17 +795,17 @@ export default {
         });
     },
     //修改更新到数据库
-    submitupdataqiandao() {
-      this.updataqiandaoform.data[0].Type_field = this.qiandaoform.Type_field;
-      this.updataqiandaoform.data[0].ID = this.qiandaoform.ID;
-      this.updataqiandaoform.data[0].Rem = this.qiandaoform.Rem;
-      this.updataqiandaoform.data[0].Introduction = this.qiandaoform.Introduction;
-      this.updataqiandaoform.data[0].ID_User = this.qiandaoform.ID_User;
-      this.updataqiandaoform.data[0].Time = this.qiandaoform.Time;
-      this.updataqiandaoform.data[0].Money = this.qiandaoform.Money;
-      this.updataqiandaoform.data[0].Param1 = this.qiandaoform.Param1;
-      this.updataqiandaoform.data[0].Param2 = this.qiandaoform.Param2;
-      this.updataqiandaoform.data[0].ID_User_NoUser = this.qiandaoform.ID_User_NoUser;
+    submitupdateqiandao(row) {
+      this.updateqiandaoform.data[0].ID = row.ID;
+      this.updateqiandaoform.data[0].Rem = row.Rem;
+      this.updateqiandaoform.data[0].Type = this.qiandaoform.Type;
+      this.updateqiandaoform.data[0].Introduction = row.Introduction;
+      this.updateqiandaoform.data[0].ID_User = row.ID_User;
+      this.updateqiandaoform.data[0].Time = row.Time;
+      this.updateqiandaoform.data[0].Money = row.Money;
+      this.updateqiandaoform.data[0].Param1 = row.Param1;
+      this.updateqiandaoform.data[0].Param2 = row.Param2;
+      this.updateqiandaoform.data[0].ID_User_NoUser = row.ID_User_NoUser;
       let that = this;
       //执行Axios请求
       axios
